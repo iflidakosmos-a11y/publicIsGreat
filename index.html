@@ -581,7 +581,7 @@ async function triggerAISearch(query){
   try {
     const resp = await fetch('https://api.anthropic.com/v1/messages', {
       method:'POST',
-      headers:{ 'Content-Type':'application/json' },
+	    headers:{ 'Content-Type':'application/json', 'x-api-key':'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', 'anthropic-version':'2023-06-01' },
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514',
         max_tokens:300,
