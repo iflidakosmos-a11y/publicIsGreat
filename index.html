@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>蛋白質紀錄</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f1117;
+  --surface: #1a1d27;
+  --surface2: #22263a;
+  --accent: #7fff6e;
+  --accent2: #4fc3f7;
+  --text: #e8eaf0;
+  --muted: #6b7280;
+  --border: #2d3148;
+  --red: #ff6b6b;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Noto Sans TC',sans-serif;
+  min-height:100vh;
+  padding:24px 16px 80px;
+  max-width:480px;
+  margin:0 auto;
+}
+h1 { font-size:1.4rem; font-weight:700; margin-bottom:2px; }
+.subtitle { color:var(--muted); font-size:.82rem; margin-bottom:20px; }
+
+/* CALENDAR */
+.cal-card {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:16px;
+}
+.cal-header {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:12px;
+}
+.cal-title {
+  font-family:'DM Mono',monospace; font-size:.88rem;
+  color:var(--accent2); letter-spacing:.06em;
+}
+.cal-nav {
+  background:none; border:1px solid var(--border);
+  border-radius:8px; color:var(--text); cursor:pointer;
+  font-size:.9rem; padding:4px 10px; transition:border-color .15s;
+}
+.cal-nav:hover { border-color:var(--accent2); }
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
+.cal-dow {
+  text-align:center; font-size:.68rem; color:var(--muted); padding:3px 0;
+}
+.cal-day {
+  text-align:center; font-size:.8rem; padding:6px 2px;
+  border-radius:8px; cursor:pointer; line-height:1.2;
+  transition:background .12s;
+}
+.cal-day:hover { background:var(--surface2); }
+.cal-day.empty { cursor:default; pointer-events:none; }
+.cal-day.today { color:var(--accent); font-weight:700; }
+.cal-day.selected { background:var(--accent); color:#0f1117; font-weight:700; }
+.cal-day.selected:hover { background:var(--accent); }
+.cal-day.has-data::after {
+  content:''; display:block; width:4px; height:4px;
+  background:var(--accent2); border-radius:50%; margin:2px auto 0;
+}
+.cal-day.selected.has-data::after { background:#0f1117; }
+.selected-label {
+  font-family:'DM Mono',monospace; font-size:.74rem;
+  color:var(--accent); margin-top:10px; letter-spacing:.05em;
+}
+
+/* GOAL + RING */
+.goal-row {
+  display:flex; align-items:center; gap:10px;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:14px; padding:12px 16px; margin-bottom:16px;
+}
+.goal-label { font-size:.8rem; color:var(--muted); white-space:nowrap; }
+.goal-input {
+  width:68px; background:var(--surface2); border:1px solid var(--border);
+  border-radius:8px; color:var(--text); font-family:'DM Mono',monospace;
+  font-size:.95rem; padding:4px 8px; text-align:center;
+}
+.goal-input:focus { outline:none; border-color:var(--accent); }
+
+.ring-wrap {
+  position:relative; width:150px; margin:0 auto 20px;
+}
+.ring-wrap svg { transform:rotate(-90deg); display:block; }
+circle.track { fill:none; stroke:var(--surface2); stroke-width:10; }
+circle.fill {
+  fill:none; stroke:var(--accent); stroke-width:10; stroke-linecap:round;
+  transition:stroke-dashoffset .5s ease, stroke .3s;
+}
+.ring-center {
+  position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%); text-align:center;
+}
+.ring-total {
+  font-family:'DM Mono',monospace; font-size:1.9rem;
+  font-weight:500; color:var(--accent); line-height:1;
+}
+.ring-unit { font-size:.72rem; color:var(--muted); }
+.ring-pct  { font-size:.68rem; color:var(--muted); margin-top:3px; }
+
+/* INPUT CARD */
+.input-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:16px; padding:16px; margin-bottom:16px;
+}
+.card-title { font-size:.85rem; font-weight:500; color:var(--accent2); margin-bottom:12px; }
+
+.search-wrap { position:relative; margin-bottom:10px; }
+.search-input {
+  width:100%; background:var(--surface2); border:1px solid var(--border);
+  border-radius:10px; color:var(--text); font-family:'Noto Sans TC',sans-serif;
+  font-size:.9rem; padding:9px 12px;
+}
+.search-input:focus { outline:none; border-color:var(--accent2); }
+.search-input::placeholder { color:var(--muted); }
+
+.dropdown {
+  position:absolute; top:calc(100% + 4px); left:0; right:0;
+  background:var(--surface2); border:1px solid var(--accent2);
+  border-radius:10px; max-height:200px; overflow-y:auto;
+  z-index:100; display:none;
+}
+.dropdown.open { display:block; }
+.dropdown-item {
+  padding:9px 12px; cursor:pointer; display:flex;
+  align-items:center; justify-content:space-between;
+  font-size:.88rem; border-bottom:1px solid rgba(45,49,72,.5);
+  transition:background .1s;
+}
+.dropdown-item:last-child { border-bottom:none; }
+.dropdown-item:hover, .dropdown-item.active { background:rgba(79,195,247,.12); }
+.food-name { display:flex; align-items:center; gap:6px; }
+.food-prot { font-family:'DM Mono',monospace; font-size:.75rem; color:var(--accent); }
+.dd-no-result { padding:12px; color:var(--muted); font-size:.85rem; text-align:center; }
+
+.qty-row { display:flex; gap:8px; align-items:flex-end; }
+.field { display:flex; flex-direction:column; gap:4px; flex:1; }
+.field label { font-size:.72rem; color:var(--muted); }
+.field input {
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:10px; color:var(--text);
+  font-family:'Noto Sans TC',sans-serif; font-size:.9rem; padding:8px 10px; width:100%;
+}
+.field input:focus { outline:none; border-color:var(--accent2); }
+.qty-field { flex:0 0 90px; }
+.add-btn {
+  background:var(--accent); border:none; border-radius:10px;
+  color:#0f1117; cursor:pointer; font-family:'Noto Sans TC',sans-serif;
+  font-size:.88rem; font-weight:700; padding:8px 18px;
+  transition:opacity .15s; white-space:nowrap; align-self:flex-end;
+}
+.add-btn:hover { opacity:.85; }
+.protein-hint {
+  font-family:'DM Mono',monospace; font-size:.72rem;
+  color:var(--accent); min-height:1.2em; margin-top:6px;
+}
+.divider { border:none; border-top:1px solid var(--border); margin:14px 0; }
+
+.new-food-title { font-size:.78rem; color:var(--muted); margin-bottom:8px; }
+.new-food-grid {
+  display:grid; grid-template-columns:1fr 90px 70px; gap:6px; margin-bottom:8px;
+}
+.new-food-grid .field input { font-size:.82rem; }
+.add-food-btn {
+  background:var(--surface2); border:1px solid var(--accent2);
+  border-radius:10px; color:var(--accent2); cursor:pointer;
+  font-family:'Noto Sans TC',sans-serif; font-size:.8rem;
+  padding:7px 12px; transition:background .15s; white-space:nowrap;
+}
+.add-food-btn:hover { background:rgba(79,195,247,.1); }
+
+/* LOG */
+.log-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:16px; padding:16px; margin-bottom:16px;
+}
+.log-card-header {
+  display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;
+}
+.log-empty { font-size:.83rem; color:var(--muted); text-align:center; padding:18px 0; }
+.log-item {
+  display:flex; align-items:center; gap:10px;
+  padding:9px 0; border-bottom:1px solid var(--border);
+  animation:slideIn .2s ease;
+}
+@keyframes slideIn {
+  from { opacity:0; transform:translateY(-5px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.log-item:last-child { border-bottom:none; }
+.log-icon {
+  width:34px; height:34px; background:var(--surface2); border-radius:9px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1rem; flex-shrink:0;
+}
+.log-info { flex:1; min-width:0; }
+.log-name { font-size:.88rem; font-weight:500; }
+.log-detail { font-size:.73rem; color:var(--muted); margin-top:1px; }
+.log-protein {
+  font-family:'DM Mono',monospace; font-size:.9rem;
+  color:var(--accent); font-weight:500; white-space:nowrap;
+}
+.del-btn {
+  background:none; border:none; color:var(--muted); cursor:pointer;
+  font-size:.85rem; padding:3px 6px; border-radius:6px;
+  transition:color .12s, background .12s;
+}
+.del-btn:hover { color:var(--red); background:rgba(255,107,107,.1); }
+.clear-btn {
+  background:transparent; border:1px solid var(--border); border-radius:8px;
+  color:var(--muted); cursor:pointer; font-family:'Noto Sans TC',sans-serif;
+  font-size:.75rem; padding:5px 12px; transition:border-color .15s, color .15s;
+}
+.clear-btn:hover { border-color:var(--red); color:var(--red); }
+
+/* FOOD TABLE */
+.table-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:16px; padding:16px; margin-bottom:16px;
+}
+.food-table { width:100%; border-collapse:collapse; font-size:.8rem; }
+.food-table th {
+  text-align:left; color:var(--muted); font-weight:400;
+  padding:4px 8px; border-bottom:1px solid var(--border);
+}
+.food-table td { padding:6px 8px; border-bottom:1px solid rgba(45,49,72,.4); }
+.food-table tr:last-child td { border-bottom:none; }
+.prot-cell { font-family:'DM Mono',monospace; color:var(--accent); }
+.del-food-btn {
+  background:none; border:none; color:var(--muted); cursor:pointer;
+  font-size:.8rem; padding:2px 5px; border-radius:4px; transition:color .1s;
+}
+.del-food-btn:hover { color:var(--red); }
+
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+</style>
+</head>
+<body>
+
+<h1>🥩 蛋白質紀錄</h1>
+<p class="subtitle">追蹤每日蛋白質攝取量</p>
+
+<!-- CALENDAR -->
+<div class="cal-card">
+  <div class="cal-header">
+    <button class="cal-nav" id="prevMonth">‹</button>
+    <div class="cal-title" id="calTitle"></div>
+    <button class="cal-nav" id="nextMonth">›</button>
+  </div>
+  <div class="cal-grid" id="calGrid"></div>
+  <div class="selected-label" id="selectedLabel"></div>
+</div>
+
+<!-- GOAL + RING -->
+<div class="goal-row">
+  <span class="goal-label">每日目標</span>
+  <input class="goal-input" id="goalInput" type="number" min="1" value="130">
+  <span style="font-size:.8rem;color:var(--muted)">g 蛋白質</span>
+</div>
+<div class="ring-wrap">
+  <svg width="150" height="150" viewBox="0 0 150 150">
+    <circle class="track" cx="75" cy="75" r="60"/>
+    <circle class="fill" id="ringFill" cx="75" cy="75" r="60"
+            stroke-dasharray="376.99" stroke-dashoffset="376.99"/>
+  </svg>
+  <div class="ring-center">
+    <div class="ring-total" id="totalDisplay">0</div>
+    <div class="ring-unit">g 蛋白質</div>
+    <div class="ring-pct" id="pctDisplay">0%</div>
+  </div>
+</div>
+
+<!-- INPUT -->
+<div class="input-card">
+  <div class="card-title">➕ 新增食物</div>
+  <div class="search-wrap">
+    <input class="search-input" id="searchInput"
+           placeholder="🔍 輸入食物名稱搜尋，例：雞蛋"
+           autocomplete="off">
+    <div class="dropdown" id="dropdown"></div>
+  </div>
+  <div class="qty-row">
+    <div class="field">
+      <label id="qtyLabel">數量</label>
+      <input type="number" id="qtyInput" min="0.1" step="0.5" value="1">
+    </div>
+    <div class="field qty-field">
+      <label>單位</label>
+      <input type="text" id="unitDisplay" readonly placeholder="—">
+    </div>
+    <button class="add-btn" onclick="addEntry()">加入</button>
+  </div>
+  <div class="protein-hint" id="proteinHint"></div>
+  <hr class="divider">
+  <div class="new-food-title">＋ 新增食物到資料庫</div>
+  <div class="new-food-grid">
+    <div class="field"><label>食物名稱</label><input type="text" id="newName" placeholder="例：豬肉片"></div>
+    <div class="field"><label>蛋白質(g)</label><input type="number" id="newProtein" step="0.1" placeholder="每份"></div>
+    <div class="field"><label>單位</label><input type="text" id="newUnit" placeholder="g/顆/份…"></div>
+  </div>
+  <button class="add-food-btn" id="addFoodBtn" onclick="addFoodToDB()">新增到資料庫</button>
+</div>
+
+<!-- LOG -->
+<div class="log-card">
+  <div class="log-card-header">
+    <div class="card-title" style="margin:0">📋 <span id="logDateLabel"></span> 紀錄</div>
+    <button class="clear-btn" onclick="clearAll()">清除</button>
+  </div>
+  <div id="logList"></div>
+</div>
+
+<!-- FOOD TABLE -->
+<div class="table-card">
+  <div class="card-title" style="margin-bottom:10px">📊 食物蛋白質含量表</div>
+  <table class="food-table">
+    <thead><tr><th>食物</th><th>蛋白質</th><th>說明</th><th></th></tr></thead>
+    <tbody id="foodTableBody"></tbody>
+  </table>
+</div>
+
+<script>
+// ──────────────────────────────────
+//  食物資料庫
+// ──────────────────────────────────
+const DEFAULT_FOODS = [
+  { name:'雞蛋',       emoji:'🥚', protein:6.5,  unit:'顆',  per:'每顆' },
+  { name:'雞蛋白',     emoji:'🥚', protein:3.6,  unit:'顆',  per:'每顆' },
+  { name:'茶葉蛋',     emoji:'🥚', protein:7,    unit:'顆',  per:'每顆' },
+  { name:'雞胸肉',     emoji:'🍗', protein:31,   unit:'g',   per:'每100g' },
+  { name:'雞腿(去皮)', emoji:'🍗', protein:26,   unit:'g',   per:'每100g' },
+  { name:'鮭魚',       emoji:'🐟', protein:25,   unit:'g',   per:'每100g' },
+  { name:'鮪魚罐頭',   emoji:'🐠', protein:26,   unit:'g',   per:'每100g' },
+  { name:'鱈魚',       emoji:'🐡', protein:18,   unit:'g',   per:'每100g' },
+  { name:'蝦仁',       emoji:'🍤', protein:24,   unit:'g',   per:'每100g' },
+  { name:'豆腐(板)',   emoji:'🟫', protein:8,    unit:'g',   per:'每100g' },
+  { name:'嫩豆腐',     emoji:'🟨', protein:5,    unit:'g',   per:'每100g' },
+  { name:'毛豆',       emoji:'🫛', protein:11.5, unit:'g',   per:'每100g' },
+  { name:'黃豆',       emoji:'🫘', protein:36,   unit:'g',   per:'每100g' },
+  { name:'黑豆',       emoji:'🫘', protein:36,   unit:'g',   per:'每100g' },
+  { name:'納豆',       emoji:'🫘', protein:16.5, unit:'g',   per:'每100g' },
+  { name:'無糖豆漿',   emoji:'🥛', protein:3.6,  unit:'ml',  per:'每100ml' },
+  { name:'豬里肌',     emoji:'🥩', protein:22,   unit:'g',   per:'每100g' },
+  { name:'牛腱',       emoji:'🥩', protein:26,   unit:'g',   per:'每100g' },
+  { name:'豬血糕',     emoji:'🍱', protein:7,    unit:'g',   per:'每100g' },
+  { name:'希臘優格',   emoji:'🫙', protein:10,   unit:'g',   per:'每100g' },
+  { name:'牛奶',       emoji:'🥛', protein:3.4,  unit:'ml',  per:'每100ml' },
+  { name:'起司片',     emoji:'🧀', protein:4,    unit:'片',  per:'每片' },
+  { name:'高蛋白粉',   emoji:'💪', protein:24,   unit:'份',  per:'每份(30g)' },
+  { name:'花生醬',     emoji:'🥜', protein:25,   unit:'g',   per:'每100g' },
+];
+
+let foods = JSON.parse(localStorage.getItem('pt_foods') || 'null') || DEFAULT_FOODS;
+function saveFoods() { localStorage.setItem('pt_foods', JSON.stringify(foods)); }
+
+// ──────────────────────────────────
+//  日期
+// ──────────────────────────────────
+const DOW = ['日','一','二','三','四','五','六'];
+let calYear, calMonth, selectedDate;
+
+function todayStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+function pad(n) { return String(n).padStart(2,'0'); }
+
+function niceDateLabel(ds) {
+  if(ds === todayStr()) return '今天';
+  const [y,m,d] = ds.split('-').map(Number);
+  const dow = new Date(y,m-1,d).getDay();
+  return `${y}/${m}/${d} 週${DOW[dow]}`;
+}
+
+// ──────────────────────────────────
+//  月曆
+// ──────────────────────────────────
+function renderCalendar() {
+  const t = todayStr();
+  document.getElementById('calTitle').textContent = `${calYear} 年 ${calMonth+1} 月`;
+
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+  DOW.forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cal-dow'; el.textContent = d; grid.appendChild(el);
+  });
+
+  const firstDow = new Date(calYear, calMonth, 1).getDay();
+  const totalDays = new Date(calYear, calMonth+1, 0).getDate();
+
+  for(let i=0; i<firstDow; i++) {
+    const el = document.createElement('div'); el.className='cal-day empty'; grid.appendChild(el);
+  }
+  for(let d=1; d<=totalDays; d++) {
+    const ds = `${calYear}-${pad(calMonth+1)}-${pad(d)}`;
+    const el = document.createElement('div');
+    el.className = 'cal-day';
+    el.textContent = d;
+    if(ds === t) el.classList.add('today');
+    if(ds === selectedDate) el.classList.add('selected');
+    const log = getLog(ds);
+    if(log.length) el.classList.add('has-data');
+    el.onclick = () => selectDate(ds);
+    grid.appendChild(el);
+  }
+  document.getElementById('selectedLabel').textContent = '📅 ' + niceDateLabel(selectedDate);
+  document.getElementById('logDateLabel').textContent = niceDateLabel(selectedDate);
+}
+
+function selectDate(ds) {
+  selectedDate = ds;
+  renderCalendar();
+  renderLog();
+  renderTotal();
+}
+
+document.getElementById('prevMonth').onclick = () => {
+  calMonth--; if(calMonth<0){ calMonth=11; calYear--; } renderCalendar();
+};
+document.getElementById('nextMonth').onclick = () => {
+  calMonth++; if(calMonth>11){ calMonth=0; calYear++; } renderCalendar();
+};
+
+// ──────────────────────────────────
+//  紀錄存取
+// ──────────────────────────────────
+function getLog(ds) { return JSON.parse(localStorage.getItem('ptLog_'+ds)||'[]'); }
+function setLog(ds, log) { localStorage.setItem('ptLog_'+ds, JSON.stringify(log)); }
+
+// ──────────────────────────────────
+//  模糊搜尋
+// ──────────────────────────────────
+let selectedFood = null;
+let ddIdx = -1;
+
+function fuzzy(q, name) {
+  q = q.toLowerCase(); name = name.toLowerCase();
+  if(name.includes(q)) return true;
+  let qi=0;
+  for(let i=0;i<name.length&&qi<q.length;i++) if(name[i]===q[qi]) qi++;
+  return qi===q.length;
+}
+
+function showDropdown(results) {
+  const dd = document.getElementById('dropdown');
+  dd.innerHTML = '';
+  if(!results.length) {
+    dd.innerHTML = '<div class="dd-no-result">找不到，可在下方新增到資料庫</div>';
+    dd.classList.add('open'); return;
+  }
+  results.forEach(f => {
+    const item = document.createElement('div');
+    item.className = 'dropdown-item';
+    item.innerHTML = `<span class="food-name">${f.emoji} ${f.name}</span><span class="food-prot">${f.protein}g ${f.per}</span>`;
+    item.onmousedown = (e) => { e.preventDefault(); pickFood(f); };
+    dd.appendChild(item);
+  });
+  ddIdx = -1;
+  dd.classList.add('open');
+}
+
+function closeDD() { document.getElementById('dropdown').classList.remove('open'); }
+
+function pickFood(f) {
+  selectedFood = f;
+  document.getElementById('searchInput').value = f.name;
+  document.getElementById('unitDisplay').value = f.unit;
+  document.getElementById('qtyLabel').textContent = `數量 (${f.unit})`;
+  document.getElementById('proteinHint').textContent = `蛋白質：${f.protein}g ${f.per}`;
+  closeDD();
+  document.getElementById('qtyInput').focus();
+}
+
+const si = document.getElementById('searchInput');
+si.addEventListener('input', () => {
+  selectedFood = null;
+  document.getElementById('unitDisplay').value = '';
+  document.getElementById('proteinHint').textContent = '';
+  document.getElementById('qtyLabel').textContent = '數量';
+  const q = si.value.trim();
+  if(!q) { closeDD(); return; }
+  showDropdown(foods.filter(f=>fuzzy(q,f.name)).slice(0,8));
+});
+
+si.addEventListener('keydown', (e) => {
+  const dd = document.getElementById('dropdown');
+  const items = dd.querySelectorAll('.dropdown-item');
+  if(!items.length) { if(e.key==='Enter') addEntry(); return; }
+  if(e.key==='ArrowDown'){
+    e.preventDefault(); ddIdx=Math.min(ddIdx+1,items.length-1);
+    items.forEach((it,i)=>it.classList.toggle('active',i===ddIdx));
+  } else if(e.key==='ArrowUp'){
+    e.preventDefault(); ddIdx=Math.max(ddIdx-1,0);
+    items.forEach((it,i)=>it.classList.toggle('active',i===ddIdx));
+  } else if(e.key==='Enter'){
+    if(ddIdx>=0) items[ddIdx].dispatchEvent(new MouseEvent('mousedown'));
+    else addEntry();
+  } else if(e.key==='Escape') closeDD();
+});
+
+si.addEventListener('blur', () => setTimeout(closeDD, 150));
+
+// ──────────────────────────────────
+//  加入紀錄
+// ──────────────────────────────────
+function addEntry() {
+  if(!selectedFood) { si.focus(); return; }
+  const qty = parseFloat(document.getElementById('qtyInput').value);
+  if(!qty||qty<=0) { alert('請輸入有效數量！'); return; }
+  const f = selectedFood;
+  const protein = (f.unit==='g'||f.unit==='ml')
+    ? +(f.protein*qty/100).toFixed(1)
+    : +(f.protein*qty).toFixed(1);
+  const log = getLog(selectedDate);
+  log.push({ name:f.name, emoji:f.emoji, qty, unit:f.unit, protein,
+    time:new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'}) });
+  setLog(selectedDate, log);
+  selectedFood = null;
+  si.value='';
+  document.getElementById('qtyInput').value=1;
+  document.getElementById('unitDisplay').value='';
+  document.getElementById('proteinHint').textContent='';
+  document.getElementById('qtyLabel').textContent='數量';
+  renderCalendar(); renderLog(); renderTotal();
+}
+
+// ──────────────────────────────────
+//  新增食物到資料庫
+// ──────────────────────────────────
+function addFoodToDB() {
+  const name    = document.getElementById('newName').value.trim();
+  const protein = parseFloat(document.getElementById('newProtein').value);
+  const unit    = document.getElementById('newUnit').value.trim() || 'g';
+  if(!name||!protein){ alert('請填寫食物名稱和蛋白質含量！'); return; }
+  const per = (unit==='g'||unit==='ml') ? `每100${unit}` : `每${unit}`;
+  foods.push({ name, emoji:'🍽️', protein, unit, per });
+  saveFoods(); buildTable();
+  document.getElementById('newName').value='';
+  document.getElementById('newProtein').value='';
+  document.getElementById('newUnit').value='';
+  const btn = document.getElementById('addFoodBtn');
+  btn.textContent=`✅ 已新增「${name}」`;
+  setTimeout(()=>btn.textContent='新增到資料庫', 2000);
+}
+
+// ──────────────────────────────────
+//  刪除 / 清除
+// ──────────────────────────────────
+function deleteEntry(i) {
+  const log = getLog(selectedDate); log.splice(i,1); setLog(selectedDate,log);
+  renderCalendar(); renderLog(); renderTotal();
+}
+function clearAll() {
+  const log = getLog(selectedDate); if(!log.length) return;
+  if(confirm(`確定清除「${niceDateLabel(selectedDate)}」的所有紀錄？`)) {
+    setLog(selectedDate,[]); renderCalendar(); renderLog(); renderTotal();
+  }
+}
+
+// ──────────────────────────────────
+//  渲染紀錄
+// ──────────────────────────────────
+function renderLog() {
+  const log = getLog(selectedDate);
+  document.getElementById('logDateLabel').textContent = niceDateLabel(selectedDate);
+  const div = document.getElementById('logList');
+  if(!log.length) { div.innerHTML='<div class="log-empty">尚無紀錄，開始新增吧！</div>'; return; }
+  div.innerHTML = log.map((e,i)=>`
+    <div class="log-item">
+      <div class="log-icon">${e.emoji}</div>
+      <div class="log-info">
+        <div class="log-name">${e.name}</div>
+        <div class="log-detail">${e.qty}${e.unit} &nbsp;·&nbsp; ${e.time}</div>
+      </div>
+      <div class="log-protein">+${e.protein}g</div>
+      <button class="del-btn" onclick="deleteEntry(${i})">✕</button>
+    </div>`).join('');
+}
+
+function renderTotal() {
+  const log = getLog(selectedDate);
+  const total = +log.reduce((s,e)=>s+e.protein,0).toFixed(1);
+  const goal  = parseFloat(document.getElementById('goalInput').value)||130;
+  const pct   = Math.min(total/goal,1);
+  const circ  = 2*Math.PI*60;
+  document.getElementById('totalDisplay').textContent = total;
+  document.getElementById('pctDisplay').textContent   = Math.round(total/goal*100)+'%';
+  const fill = document.getElementById('ringFill');
+  fill.style.strokeDashoffset = circ*(1-pct);
+  fill.style.stroke = pct>=1 ? '#7fff6e' : pct>.6 ? '#7fff6e' : '#4fc3f7';
+}
+
+// ──────────────────────────────────
+//  食物含量表
+// ──────────────────────────────────
+function buildTable() {
+  const tbody = document.getElementById('foodTableBody');
+  tbody.innerHTML = '';
+  foods.forEach((f,i)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML=`<td>${f.emoji} ${f.name}</td><td class="prot-cell">${f.protein}g</td><td style="color:var(--muted)">${f.per}</td><td><button class="del-food-btn" onclick="deleteFoodFromDB(${i})">✕</button></td>`;
+    tbody.appendChild(tr);
+  });
+}
+function deleteFoodFromDB(i) {
+  if(!confirm(`確定刪除「${foods[i].name}」？`)) return;
+  foods.splice(i,1); saveFoods(); buildTable();
+}
+
+// ──────────────────────────────────
+//  初始化
+// ──────────────────────────────────
+document.getElementById('goalInput').addEventListener('input', renderTotal);
+
+const _t = new Date();
+calYear=_t.getFullYear(); calMonth=_t.getMonth(); selectedDate=todayStr();
+renderCalendar(); renderLog(); renderTotal(); buildTable();
+</script>
+</body>
+</html>
