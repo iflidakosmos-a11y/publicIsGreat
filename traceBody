@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="每日鍛鍊">
+<title>鍛鍊追蹤</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #F0F8FF;
+    --bg2:      #FFFFFF;
+    --bg3:      #EBF6FF;
+    --border:   #C8E6FA;
+    --border2:  #93CFEF;
+    --text:     #062A6A;
+    --muted:    #5A8DB0;
+    --accent:   #1976D2;
+    --accent2:  #4EAAE0;
+    --accent3:  #0D47A1;
+    --light:    #C8E6FA;
+    --lighter:  #EBF6FF;
+    --check-bg: #E3F4FD;
+    --check-on: #1976D2;
+    --tag-bg:   #C8E6FA;
+    --tag-text: #0D47A1;
+    --green:    #1D9E75;
+    --green-bg: #E1F5EE;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+  .app { max-width: 430px; margin: 0 auto; padding-bottom: 48px; }
+
+  /* Header */
+  .header {
+    padding: 48px 16px 12px;
+    background: linear-gradient(160deg, #1976D2 0%, #4EAAE0 100%);
+    position: sticky; top: 0; z-index: 20;
+  }
+  .header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .header-title {
+    font-size: 20px; font-weight: 900; letter-spacing: 3px;
+    color: #fff;
+  }
+  .week-nav { display: flex; align-items: center; gap: 8px; }
+  .week-btn {
+    width: 30px; height: 30px; border-radius: 8px; border: 1.5px solid rgba(255,255,255,0.4);
+    background: rgba(255,255,255,0.15); color: #fff; font-size: 15px;
+    font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s; line-height: 1;
+  }
+  .week-btn:active { background: rgba(255,255,255,0.35); }
+  .week-label { font-size: 11px; color: rgba(255,255,255,0.85); letter-spacing: 0.5px; min-width: 60px; text-align: center; }
+  .header-date { font-size: 12px; color: rgba(255,255,255,0.7); letter-spacing: 1px; }
+
+  /* Day Tabs */
+  .day-tabs {
+    display: flex; gap: 5px; padding: 10px 12px;
+    background: #fff; border-bottom: 1.5px solid var(--border);
+    overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+    position: sticky; top: 84px; z-index: 19;
+  }
+  .day-tabs::-webkit-scrollbar { display: none; }
+  .day-tab {
+    flex-shrink: 0; min-width: 44px; padding: 6px 8px; border-radius: 10px;
+    border: 1.5px solid var(--border); background: var(--lighter);
+    color: var(--muted); font-size: 11px; font-weight: 700;
+    font-family: inherit; cursor: pointer; text-align: center;
+    transition: all 0.18s; line-height: 1.4;
+  }
+  .day-tab .tab-day { font-size: 13px; font-weight: 900; }
+  .day-tab .tab-date { font-size: 10px; opacity: 0.7; margin-top: 1px; }
+  .day-tab.active {
+    background: var(--accent); border-color: var(--accent);
+    color: #fff; box-shadow: 0 3px 10px #1976D244;
+  }
+  .day-tab.active .tab-date { opacity: 0.8; }
+  .day-tab.today-mark { border-color: var(--accent2); }
+
+  /* Progress */
+  .progress-wrap { padding: 12px 14px 6px; background: #fff; border-bottom: 1px solid var(--border); }
+  .progress-header { display: flex; justify-content: space-between; margin-bottom: 7px; }
+  .progress-label { font-size: 11px; color: var(--muted); letter-spacing: 1px; }
+  .progress-count { font-size: 11px; color: var(--accent); font-weight: 700; }
+  .progress-track { background: var(--lighter); border-radius: 8px; height: 7px; overflow: hidden; }
+  .progress-fill {
+    height: 100%; border-radius: 8px; transition: width 0.45s cubic-bezier(.4,0,.2,1);
+    background: linear-gradient(90deg, var(--accent2), var(--accent));
+  }
+  .progress-fill.complete { background: linear-gradient(90deg, #5DCAA5, var(--green)); }
+
+  /* Content */
+  .content { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+
+  /* Section */
+  .section { border-radius: 16px; overflow: hidden; border: 1.5px solid var(--border); background: #fff; box-shadow: 0 2px 8px #1976D210; }
+  .section-head {
+    padding: 9px 16px; font-size: 13px; font-weight: 800;
+    letter-spacing: 2px;
+    border-bottom: 1px solid var(--border);
+    background: #EBF6FF; color: #0D47A1;
+  }
+  .section-body { background: #fff; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+
+  /* Check Item */
+  .check-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 13px; border-radius: 12px;
+    border: 1.5px solid var(--border); background: var(--lighter);
+    cursor: pointer; width: 100%; font-family: inherit; text-align: left;
+    transition: all 0.18s; -webkit-appearance: none;
+  }
+  .check-item.checked { background: var(--green-bg); border-color: #9AF5D2; }
+  .check-item:active { transform: scale(0.97); }
+  .check-box {
+    width: 22px; height: 22px; border-radius: 6px; flex-shrink: 0;
+    border: 2px solid var(--border2); background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 900; color: #fff;
+    transition: all 0.18s;
+  }
+  .check-item.checked .check-box { background: var(--green); border-color: var(--green); }
+  .check-label { font-size: 14px; font-weight: 500; color: var(--text); flex: 1; transition: all 0.18s; }
+  .check-item.checked .check-label { color: var(--green); text-decoration: line-through; opacity: 0.65; }
+
+  /* Practice Multi-Select */
+  .practice-section { border-radius: 12px; border: 1.5px solid var(--border); background: var(--lighter); overflow: hidden; }
+  .practice-header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 11px 13px; border-bottom: 1px solid var(--border);
+    background: var(--lighter);
+  }
+  .practice-header-icon { font-size: 14px; }
+  .practice-header-label { font-size: 14px; font-weight: 700; color: var(--muted); flex: 1; }
+  .practice-header-count { font-size: 14px; color: var(--accent); font-weight: 700; }
+
+  .practice-options { display: flex; flex-wrap: wrap; gap: 7px; padding: 10px 12px 12px; }
+  .practice-tag {
+    padding: 6px 14px; border-radius: 99px; font-size: 14px; font-weight: 500;
+    border: 1.5px solid var(--border2); background: #fff; color: var(--muted);
+    cursor: pointer; font-family: inherit; transition: all 0.18s; -webkit-appearance: none;
+  }
+  .practice-tag.selected { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 2px 6px #1976D230; }
+  .practice-tag:active { transform: scale(0.96); }
+
+  /* Add custom item */
+  .add-row {
+    display: flex; gap: 7px; padding: 0 12px 12px;
+  }
+  .add-input {
+    flex: 1; padding: 7px 12px; border-radius: 20px;
+    border: 1.5px solid var(--border2); background: #fff;
+    font-size: 13px; font-family: inherit; color: var(--text);
+    outline: none;
+  }
+  .add-input::placeholder { color: var(--muted); opacity: 0.7; }
+  .add-input:focus { border-color: var(--accent); }
+  .add-btn {
+    padding: 7px 16px; border-radius: 20px; border: none;
+    background: var(--accent); color: #fff; font-size: 13px;
+    font-weight: 700; font-family: inherit; cursor: pointer; white-space: nowrap;
+    transition: background 0.15s;
+  }
+  .add-btn:active { background: var(--accent3); transform: scale(0.96); }
+
+  /* Weekend */
+  .weekend-msg {
+    text-align: center; padding: 28px 0;
+    color: var(--muted); font-size: 14px; line-height: 2; opacity: 0.6;
+  }
+  .weekend-emoji { font-size: 36px; display: block; margin-bottom: 8px; }
+
+  /* Modal backdrop */
+  .modal-backdrop {
+    display: none; position: fixed; inset: 0; z-index: 100;
+    background: rgba(0,0,0,0.35); align-items: flex-end; justify-content: center;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: #fff; border-radius: 20px 20px 0 0; padding: 20px;
+    width: 100%; max-width: 430px; padding-bottom: 40px;
+  }
+  .modal h3 { font-size: 15px; font-weight: 800; color: var(--text); margin-bottom: 14px; }
+  .modal-input {
+    width: 100%; padding: 10px 14px; border-radius: 12px;
+    border: 1.5px solid var(--border2); font-size: 14px;
+    font-family: inherit; color: var(--text); outline: none; margin-bottom: 10px;
+  }
+  .modal-input:focus { border-color: var(--accent); }
+  .modal-btns { display: flex; gap: 8px; }
+  .modal-confirm {
+    flex: 1; padding: 12px; border-radius: 12px; border: none;
+    background: var(--accent); color: #fff; font-size: 14px;
+    font-weight: 700; font-family: inherit; cursor: pointer;
+  }
+  .modal-cancel {
+    padding: 12px 20px; border-radius: 12px;
+    border: 1.5px solid var(--border2); background: var(--lighter);
+    color: var(--muted); font-size: 14px; font-family: inherit; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="header-row">
+      <div class="header-title">鍛鍊追蹤</div>
+      <div class="week-nav">
+        <button class="week-btn" id="prevWeek">&#8249;</button>
+        <span class="week-label" id="week-label"></span>
+        <button class="week-btn" id="nextWeek">&#8250;</button>
+      </div>
+    </div>
+    <div class="header-date" id="header-date"></div>
+  </div>
+  <div class="day-tabs" id="day-tabs"></div>
+  <div class="progress-wrap">
+    <div class="progress-header">
+      <span class="progress-label">今日進度</span>
+      <span class="progress-count" id="progress-count"></span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+  </div>
+  <div class="content" id="content"></div>
+</div>
+
+<!-- Add practice modal -->
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal">
+    <h3>新增練功項目</h3>
+    <input class="modal-input" id="modalInput" placeholder="輸入項目名稱…" maxlength="20">
+    <div class="modal-btns">
+      <button class="modal-cancel" id="modalCancel">取消</button>
+      <button class="modal-confirm" id="modalConfirm">新增</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DAYS_LABEL = ['一','二','三','四','五','六','日'];
+const DEFAULT_PRACTICES = ['無極印','九印','太極印','瑜伽','站樁','延展練習'];
+
+const SECTION_STYLES = {
+  morning: { label: '起床後' },
+  am:      { label: '上午'   },
+  noon:    { label: '中午'   },
+  pm:      { label: '下午'   },
+  evening: { label: '下班後' },
+  night:   { label: '睡覺前' },
+};
+
+function initDayState() {
+  return {
+    morning: { practices: [] },
+    daytime: {
+      am:   { water1000: false },
+      noon: { walk15: false },
+      pm:   { walk20: false, water2000: false, dinner: false },
+    },
+    evening: {
+      hairCare: false, exfoliate: false,   // 週三、週日
+      shower: false, yoga: false,           // 週四
+      exercise: false,                      // 週五
+    },
+    night: { practices: [], sleep1030: false }
+  };
+}
+
+function loadState() {
+  return { practices: [...DEFAULT_PRACTICES] };
+}
+
+const state = loadState();
+
+const now = new Date();
+const todayJS = now.getDay();
+const todayIndex = todayJS === 0 ? 6 : todayJS - 1;
+
+let activeDay = todayIndex;
+let weekOffset = 0;
+
+function getWeekMonday(offset) {
+  const d = new Date(now);
+  const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff + (offset || 0) * 7);
+  d.setHours(0,0,0,0);
+  return d;
+}
+
+function getDayDate(idx) {
+  const monday = getWeekMonday(weekOffset);
+  monday.setDate(monday.getDate() + idx);
+  return monday;
+}
+
+function weekKey() {
+  const monday = getWeekMonday(weekOffset);
+  return `workout-week-${monday.toISOString().slice(0,10)}`;
+}
+
+function fixDay(d) {
+  if (!d) d = initDayState();
+  if (!d.morning) d.morning = { practices: [] };
+  if (!d.morning.practices) d.morning.practices = [];
+  if (!d.daytime) d.daytime = { am: { water1000: false }, noon: { walk15: false }, pm: { walk20: false, water2000: false, dinner: false } };
+  if (!d.daytime.am) d.daytime.am = { water1000: false };
+  if (!d.daytime.noon) d.daytime.noon = { walk15: false };
+  if (!d.daytime.pm) d.daytime.pm = { walk20: false, water2000: false, dinner: false };
+  if (!d.evening) d.evening = { hairCare: false, exfoliate: false, shower: false, yoga: false, exercise: false };
+  if (!d.night) d.night = { practices: [], sleep1030: false, hairCare_sun: false, exfoliate_sun: false };
+  if (!d.night.practices) d.night.practices = [];
+  if (d.night.hairCare_sun === undefined) d.night.hairCare_sun = false;
+  if (d.night.exfoliate_sun === undefined) d.night.exfoliate_sun = false;
+  return d;
+}
+
+function loadWeekData() {
+  try {
+    const raw = localStorage.getItem(weekKey());
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length === 7) {
+        return parsed.map(fixDay);
+      }
+    }
+  } catch(e) {}
+  return Array.from({length:7}, () => fixDay(initDayState()));
+}
+
+function save() {
+  try {
+    localStorage.setItem(weekKey(), JSON.stringify(weekData));
+    localStorage.setItem('workout-practices', JSON.stringify({ practices: state.practices }));
+  } catch(e) {}
+}
+
+// Load global practices
+try {
+  const gp = localStorage.getItem('workout-practices');
+  if (gp) { const p = JSON.parse(gp); if (p.practices) state.practices = p.practices; }
+} catch(e) {}
+
+let weekData = loadWeekData();
+
+function reloadWeek() {
+  weekData = loadWeekData();
+}
+
+// Header date
+document.getElementById('header-date').textContent =
+  now.toLocaleDateString('zh-TW', {year:'numeric', month:'long', day:'numeric', weekday:'long'});
+
+function updateWeekLabel() {
+  const monday = getWeekMonday(weekOffset);
+  const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
+  const fmt = d => `${d.getMonth()+1}/${d.getDate()}`;
+  document.getElementById('week-label').textContent = `${fmt(monday)}－${fmt(sunday)}`;
+}
+
+document.getElementById('prevWeek').addEventListener('click', () => {
+  weekOffset--;
+  activeDay = weekOffset === 0 ? todayIndex : 0;
+  reloadWeek();
+  updateWeekLabel();
+  renderTabs();
+  renderContent();
+  updateProgress();
+});
+document.getElementById('nextWeek').addEventListener('click', () => {
+  weekOffset++;
+  activeDay = weekOffset === 0 ? todayIndex : 0;
+  reloadWeek();
+  updateWeekLabel();
+  renderTabs();
+  renderContent();
+  updateProgress();
+});
+
+// Render tabs
+function renderTabs() {
+  const container = document.getElementById('day-tabs');
+  container.innerHTML = '';
+  DAYS_LABEL.forEach((d, i) => {
+    const date = getDayDate(i);
+    const mm = date.getMonth() + 1;
+    const dd = date.getDate();
+    const isToday = weekOffset === 0 && i === todayIndex;
+    const btn = document.createElement('button');
+    btn.className = 'day-tab' +
+      (activeDay === i ? ' active' : '') +
+      (isToday ? ' today-mark' : '');
+    btn.innerHTML = `<div class="tab-day">週${d}</div><div class="tab-date">${mm}/${dd}</div>`;
+    btn.addEventListener('click', () => {
+      activeDay = i;
+      renderTabs();
+      renderContent();
+      updateProgress();
+    });
+    container.appendChild(btn);
+  });
+}
+
+// Progress
+function getChecks() {
+  const d = weekData[activeDay];
+  const isWD = activeDay < 5;
+  const base = isWD ? [
+    d.morning.practices.length > 0,
+    d.daytime.am.water1000,
+    d.daytime.noon.walk15,
+    d.daytime.pm.walk20,
+    d.daytime.pm.water2000,
+    d.daytime.pm.dinner,
+    d.night.practices.length > 0,
+    d.night.sleep1030,
+  ] : [
+    d.morning.practices.length > 0,
+    d.night.practices.length > 0,
+    d.night.sleep1030,
+  ];
+  if (activeDay === 2) base.push(d.evening.hairCare, d.evening.exfoliate);
+  if (activeDay === 3) base.push(d.evening.shower, d.evening.yoga);
+  if (activeDay === 4) base.push(d.evening.exercise);
+  if (activeDay === 6) base.push(d.night.hairCare_sun, d.night.exfoliate_sun);
+  return base;
+}
+
+function updateProgress() {
+  const checks = getChecks();
+  const done = checks.filter(Boolean).length;
+  const total = checks.length;
+  const pct = Math.round((done / total) * 100);
+  document.getElementById('progress-count').textContent = `${done}/${total} · ${pct}%`;
+  const fill = document.getElementById('progress-fill');
+  fill.style.width = pct + '%';
+  fill.className = 'progress-fill' + (pct === 100 ? ' complete' : '');
+}
+
+// Practice multi-select widget
+function makePracticeWidget(section) {
+  const day = weekData[activeDay];
+  const selected = day[section].practices;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'practice-section';
+
+  const header = document.createElement('div');
+  header.className = 'practice-header';
+  header.innerHTML = `
+    <span class="practice-header-icon">🥋</span>
+    <span class="practice-header-label">練功項目</span>
+    <span class="practice-header-count" id="pcount-${section}">${selected.length > 0 ? selected.length + ' 項已選' : '可多選'}</span>
+  `;
+  wrap.appendChild(header);
+
+  const opts = document.createElement('div');
+  opts.className = 'practice-options';
+
+  function refreshCount() {
+    const el = wrap.querySelector(`#pcount-${section}`);
+    if (el) el.textContent = selected.length > 0 ? selected.length + ' 項已選' : '可多選';
+    updateProgress();
+  }
+
+  function renderTags() {
+    opts.innerHTML = '';
+    state.practices.forEach(p => {
+      const tag = document.createElement('button');
+      tag.className = 'practice-tag' + (selected.includes(p) ? ' selected' : '');
+      tag.textContent = p;
+      tag.addEventListener('click', () => {
+        const idx = selected.indexOf(p);
+        if (idx >= 0) selected.splice(idx, 1);
+        else selected.push(p);
+        save();
+        tag.className = 'practice-tag' + (selected.includes(p) ? ' selected' : '');
+        refreshCount();
+      });
+      opts.appendChild(tag);
+    });
+
+    // Add new button
+    const addTag = document.createElement('button');
+    addTag.className = 'practice-tag';
+    addTag.textContent = '＋ 新增';
+    addTag.style.borderStyle = 'dashed';
+    addTag.addEventListener('click', () => openModal(renderTags));
+    opts.appendChild(addTag);
+  }
+
+  renderTags();
+  wrap.appendChild(opts);
+  return wrap;
+}
+
+// Check item — no emoji, unified font 14px
+function makeCheckItem(checked, label, onChange) {
+  const btn = document.createElement('button');
+  btn.className = 'check-item' + (checked ? ' checked' : '');
+  btn.innerHTML = `
+    <span class="check-box">${checked ? '✓' : ''}</span>
+    <span class="check-label">${label}</span>
+  `;
+  btn.addEventListener('click', () => {
+    onChange();
+    save();
+    renderContent();
+    updateProgress();
+  });
+  return btn;
+}
+
+// Section builder
+function makeSection(key, children) {
+  const s = SECTION_STYLES[key];
+  const sec = document.createElement('div');
+  sec.className = 'section';
+  const head = document.createElement('div');
+  head.className = 'section-head';
+  head.textContent = s.label;
+  const body = document.createElement('div');
+  body.className = 'section-body';
+  children.forEach(c => body.appendChild(c));
+  sec.appendChild(head);
+  sec.appendChild(body);
+  return sec;
+}
+
+function renderContent() {
+  const container = document.getElementById('content');
+  container.innerHTML = '';
+  const day = weekData[activeDay];
+  const isWeekend = activeDay >= 5;
+
+  // 起床後
+  container.appendChild(makeSection('morning', [makePracticeWidget('morning')]));
+
+  if (!isWeekend) {
+    container.appendChild(makeSection('am', [
+      makeCheckItem(day.daytime.am.water1000, '喝水 1000 cc', () => { day.daytime.am.water1000 = !day.daytime.am.water1000; }),
+    ]));
+    container.appendChild(makeSection('noon', [
+      makeCheckItem(day.daytime.noon.walk15, '走路 15 分鐘', () => { day.daytime.noon.walk15 = !day.daytime.noon.walk15; }),
+    ]));
+    container.appendChild(makeSection('pm', [
+      makeCheckItem(day.daytime.pm.walk20,    '走路 20 分鐘', () => { day.daytime.pm.walk20 = !day.daytime.pm.walk20; }),
+      makeCheckItem(day.daytime.pm.water2000, '喝水 2000 cc', () => { day.daytime.pm.water2000 = !day.daytime.pm.water2000; }),
+      makeCheckItem(day.daytime.pm.dinner,    '吃晚餐',       () => { day.daytime.pm.dinner = !day.daytime.pm.dinner; }),
+    ]));
+    if (activeDay === 2) {
+      container.appendChild(makeSection('evening', [
+        makeCheckItem(day.evening.hairCare,  '護髮',  () => { day.evening.hairCare = !day.evening.hairCare; }),
+        makeCheckItem(day.evening.exfoliate, '去角質', () => { day.evening.exfoliate = !day.evening.exfoliate; }),
+      ]));
+    }
+    if (activeDay === 3) {
+      container.appendChild(makeSection('evening', [
+        makeCheckItem(day.evening.shower, '洗好澡', () => { day.evening.shower = !day.evening.shower; }),
+        makeCheckItem(day.evening.yoga,   '練瑜伽', () => { day.evening.yoga = !day.evening.yoga; }),
+      ]));
+    }
+    if (activeDay === 4) {
+      container.appendChild(makeSection('evening', [
+        makeCheckItem(day.evening.exercise, '運動', () => { day.evening.exercise = !day.evening.exercise; }),
+      ]));
+    }
+  } else if (activeDay === 5) {
+    // 週六：休息提示
+    const msg = document.createElement('div');
+    msg.className = 'weekend-msg';
+    msg.innerHTML = '<span class="weekend-emoji">🌿</span>週末好好休息';
+    container.appendChild(msg);
+  }
+  // 週日不顯示白天任務，下面睡覺前會加護髮去角質
+
+  // 睡覺前
+  const nightItems = [makePracticeWidget('night')];
+  if (activeDay === 6) {
+    nightItems.push(
+      makeCheckItem(day.night.hairCare_sun,  '護髮',  () => { day.night.hairCare_sun = !day.night.hairCare_sun; }),
+      makeCheckItem(day.night.exfoliate_sun, '去角質', () => { day.night.exfoliate_sun = !day.night.exfoliate_sun; })
+    );
+  }
+  nightItems.push(makeCheckItem(day.night.sleep1030, '10:30 以前就寢', () => { day.night.sleep1030 = !day.night.sleep1030; }));
+  container.appendChild(makeSection('night', nightItems));
+}
+
+// Modal
+function openModal(onAdded) {
+  document.getElementById('modalInput').value = '';
+  document.getElementById('modalBackdrop').classList.add('open');
+  setTimeout(() => document.getElementById('modalInput').focus(), 100);
+
+  document.getElementById('modalConfirm').onclick = () => {
+    const val = document.getElementById('modalInput').value.trim();
+    if (val && !state.practices.includes(val)) {
+      state.practices.push(val);
+      save();
+    }
+    document.getElementById('modalBackdrop').classList.remove('open');
+    if (onAdded) onAdded();
+  };
+  document.getElementById('modalCancel').onclick = () => {
+    document.getElementById('modalBackdrop').classList.remove('open');
+  };
+  document.getElementById('modalInput').onkeydown = e => {
+    if (e.key === 'Enter') document.getElementById('modalConfirm').click();
+    if (e.key === 'Escape') document.getElementById('modalCancel').click();
+  };
+}
+
+document.getElementById('modalBackdrop').addEventListener('click', e => {
+  if (e.target === document.getElementById('modalBackdrop'))
+    document.getElementById('modalBackdrop').classList.remove('open');
+});
+
+// Init
+reloadWeek();
+updateWeekLabel();
+renderTabs();
+renderContent();
+updateProgress();
+</script>
+</body>
+</html>
