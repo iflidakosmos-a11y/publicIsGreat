@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
@@ -203,7 +202,6 @@
 
     .footer { text-align: center; font-size: 12px; color: var(--purple-border); margin-top: 10px; }
   </style>
-
 </head>
 <body>
 
@@ -224,7 +222,6 @@
 <div class="past-banner">📅 查看模式 — 過去的紀錄無法編輯</div>
 
 <!-- 帶去公司 ＋ 採買 -->
-
 <div class="card bag">
   <div class="bag-cols">
     <div class="bag-col">
@@ -247,7 +244,6 @@
 </div>
 
 <!-- 早餐 -->
-
 <div class="card">
   <div class="card-head">早餐</div>
   <div class="meal-cols">
@@ -271,7 +267,6 @@
 </div>
 
 <!-- 午餐 -->
-
 <div class="card">
   <div class="card-head">午餐</div>
   <div class="meal-cols">
@@ -283,4 +278,150 @@
         <button class="add-btn" onclick="addItem('lunch-prep')">+</button>
       </div>
     </div>
-    <div
+    <div class="meal-col">
+      <div class="meal-col-head">餐點</div>
+      <div class="item-list" id="list-lunch"></div>
+      <div class="add-row">
+        <input class="add-input" id="input-lunch" placeholder="新增…" type="text">
+        <button class="add-btn" onclick="addItem('lunch')">+</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 晚餐 -->
+<div class="card">
+  <div class="card-head">晚餐</div>
+  <div class="meal-cols">
+    <div class="meal-col">
+      <div class="meal-col-head">預先準備</div>
+      <div class="item-list" id="list-dinner-prep"></div>
+      <div class="add-row">
+        <input class="add-input" id="input-dinner-prep" placeholder="新增…" type="text">
+        <button class="add-btn" onclick="addItem('dinner-prep')">+</button>
+      </div>
+    </div>
+    <div class="meal-col">
+      <div class="meal-col-head">餐點</div>
+      <div class="item-list" id="list-dinner"></div>
+      <div class="add-row">
+        <input class="add-input" id="input-dinner" placeholder="新增…" type="text">
+        <button class="add-btn" onclick="addItem('dinner')">+</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer" id="footer">Safari → 分享 → 加入主畫面，即可釘選</div>
+
+<script>
+  var KEYS      = ['bag','shop','bfast-prep','bfast','lunch-prep','lunch','dinner-prep','dinner'];
+  var MEAL_KEYS = ['bfast-prep','bfast','lunch-prep','lunch','dinner-prep','dinner'];
+  var PREFIX    = 'myDay_v5_';
+  var dayOffset = 0;
+
+  function pad(n) { return n<10?'0'+n:''+n; }
+  function dateKey(offset) {
+    var d=new Date(); d.setDate(d.getDate()+(offset||0));
+    return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+  }
+  function getStore(dk) {
+    try { var r=localStorage.getItem(PREFIX+dk); return r?JSON.parse(r):{}; } catch(e){return{};}
+  }
+  function setStore(dk,obj) {
+    try { localStorage.setItem(PREFIX+dk,JSON.stringify(obj)); } catch(e){}
+  }
+  function getItems(key) {
+    var dk=(key==='bag'||key==='shop')?key:dateKey(dayOffset);
+    return getStore(dk)[key]||[];
+  }
+  function setItems(key,arr) {
+    var dk=(key==='bag'||key==='shop')?key:dateKey(dayOffset);
+    var s=getStore(dk); s[key]=arr; setStore(dk,s);
+  }
+
+  function renderDate() {
+    var d=new Date(); d.setDate(d.getDate()+dayOffset);
+    var days=['日','一','二','三','四','五','六'];
+    document.getElementById('dateDisplay').textContent=(d.getMonth()+1)+'月'+d.getDate()+'日（'+days[d.getDay()]+'）';
+    var labels={0:'今天','-1':'昨天',1:'明天'};
+    document.getElementById('dateTag').textContent=labels[dayOffset]||(dayOffset<0?Math.abs(dayOffset)+' 天前':'+'+dayOffset+' 天後');
+    document.body.classList.toggle('past-mode',dayOffset<0);
+    document.getElementById('prevBtn').disabled=dayOffset<=-7;
+    document.getElementById('nextBtn').disabled=dayOffset>=7;
+  }
+
+  function renderList(key) {
+    var el=document.getElementById('list-'+key);
+    if(!el) return;
+    el.innerHTML='';
+    var items=getItems(key);
+    for(var i=0;i<items.length;i++){
+      (function(idx){
+        var item=items[idx];
+        var row=document.createElement('div');
+        row.className='item-row'+(item.checked?' done':'');
+
+        var cb=document.createElement('input');
+        cb.type='checkbox'; cb.className='cb'; cb.checked=!!item.checked;
+        cb.onchange=function(){
+          var arr=getItems(key); arr[idx].checked=cb.checked; setItems(key,arr);
+          row.className='item-row'+(cb.checked?' done':'');
+        };
+
+        var txt=document.createElement('div');
+        txt.className='item-text'; txt.textContent=item.text;
+
+        var del=document.createElement('button');
+        del.className='del-btn'; del.textContent='×';
+        del.onclick=function(){ var arr=getItems(key); arr.splice(idx,1); setItems(key,arr); renderList(key); };
+
+        row.appendChild(cb); row.appendChild(txt); row.appendChild(del);
+        el.appendChild(row);
+      })(i);
+    }
+  }
+
+  function addItem(key) {
+    if(dayOffset<0) return;
+    var input=document.getElementById('input-'+key);
+    if(!input) return;
+    var text=input.value.trim();
+    if(!text) return;
+    var arr=getItems(key);
+    arr.push({text:text,checked:false});
+    setItems(key,arr);
+    renderList(key);
+    input.value=''; input.focus();
+  }
+
+  function changeDay(d) {
+    var n=dayOffset+d;
+    if(n<-7||n>7) return;
+    dayOffset=n; renderAll();
+  }
+
+  function resetDay() {
+    if(!confirm('確定清空這天的三餐紀錄？\n帶去公司清單不受影響。')) return;
+    var dk=dateKey(dayOffset), s=getStore(dk);
+    MEAL_KEYS.forEach(function(k){s[k]=[];}); setStore(dk,s);
+    MEAL_KEYS.forEach(function(k){renderList(k);});
+  }
+
+  function renderAll() {
+    renderDate();
+    KEYS.forEach(function(k){renderList(k);});
+  }
+
+  window.addEventListener('load',function(){
+    KEYS.forEach(function(k){
+      var inp=document.getElementById('input-'+k);
+      if(inp) inp.addEventListener('keydown',function(e){ if(e.key==='Enter') addItem(k); });
+    });
+  });
+
+  renderAll();
+  if(window.navigator.standalone) document.getElementById('footer').style.display='none';
+</script>
+</body>
+</html>
