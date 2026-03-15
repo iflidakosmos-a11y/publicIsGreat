@@ -23,6 +23,11 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
+    html, body {
+      overflow-x: hidden;
+      max-width: 100%;
+    }
+
     body {
       background: var(--bg);
       font-family: 'Noto Serif TC', serif;
@@ -85,7 +90,8 @@
       align-items: stretch;
     }
     .bag-col {
-      flex: 1;
+      flex: 0 0 50%;
+      width: 50%;
       min-width: 0;
       display: flex;
       flex-direction: column;
@@ -102,7 +108,7 @@
     .bag-col .item-list { flex: 1; }
     .bag-col .item-row { padding: 11px 16px; }
     .bag-col .add-row { padding: 8px 16px 12px; }
-    .bag-col .add-input { font-size: 14px; padding: 8px 10px; }
+    .bag-col .add-input { font-size: 16px; padding: 8px 10px; }
     .bag-col .add-btn { width: 38px; height: 38px; min-width: 38px; font-size: 22px; }
 
     /* ── Two-column meal card ── */
@@ -111,7 +117,8 @@
       align-items: stretch;
     }
     .meal-col {
-      flex: 1;
+      flex: 0 0 50%;
+      width: 50%;
       min-width: 0;
       display: flex;
       flex-direction: column;
@@ -126,7 +133,7 @@
     .meal-col .item-list { flex: 1; }
     .meal-col .item-row { padding: 11px 14px; border-bottom-color: #f0ebfa; }
     .meal-col .add-row { padding: 8px 14px 12px; }
-    .meal-col .add-input { font-size: 14px; padding: 8px 10px; }
+    .meal-col .add-input { font-size: 16px; padding: 8px 10px; }
     .meal-col .add-btn { width: 38px; height: 38px; min-width: 38px; font-size: 22px; }
     .item-list { padding: 0; }
     .item-row {
@@ -392,7 +399,13 @@
     arr.push({text:text,checked:false});
     setItems(key,arr);
     renderList(key);
-    input.value=''; input.focus();
+    input.value='';
+    input.blur();
+    setTimeout(function(){
+      document.documentElement.scrollLeft = 0;
+      document.body.scrollLeft = 0;
+      window.scrollTo(0, window.scrollY);
+    }, 100);
   }
 
   function changeDay(d) {
