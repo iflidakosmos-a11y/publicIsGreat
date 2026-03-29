@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bonjour! 法語學習</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#eef1f8;--white:#fff;--surface:#f4f7ff;--border:#c5cee0;
+    --accent:#1a3a8f;--accent2:#c0392b;--green:#157a4a;--gold:#b8860b;
+    --purple:#5b2d8e;--teal:#0d6e6e;
+    --text-main:#0a0a1a;--text-sub:#2a2a4a;--text-muted:#555577;
+    --playing-bg:#d4e4ff;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-main);min-height:100vh;}
+  .app{max-width:860px;margin:0 auto;padding:0 16px 60px;}
+
+  header{background:var(--accent);color:#fff;padding:28px 24px 22px;text-align:center;margin-bottom:24px;border-radius:0 0 20px 20px;box-shadow:0 4px 20px rgba(26,58,143,0.3);}
+  .flag-row{display:flex;justify-content:center;margin-bottom:12px;}
+  .flag-row span{width:16px;height:44px;}
+  .flag-row .fb{background:#002395;border-radius:4px 0 0 4px;}
+  .flag-row .fw{background:#fff;}
+  .flag-row .fr2{background:#ED2939;border-radius:0 4px 4px 0;}
+  header h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,5vw,2.8rem);color:#fff;letter-spacing:2px;}
+  header p{color:rgba(255,255,255,0.78);font-size:0.82rem;margin-top:5px;letter-spacing:2px;text-transform:uppercase;}
+
+  .main-tabs{display:flex;gap:8px;margin-bottom:22px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;}
+  .main-tabs::-webkit-scrollbar{display:none;}
+  .tab-btn{flex-shrink:0;padding:10px 20px;border:2px solid var(--border);background:var(--white);color:var(--text-sub);font-family:'DM Sans',sans-serif;font-size:0.86rem;font-weight:600;cursor:pointer;border-radius:30px;transition:all 0.2s;}
+  .tab-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--surface);}
+  .tab-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+  .section{display:none;animation:fadeUp 0.3s ease;}
+  .section.active{display:block;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  .section-title{font-size:1.2rem;font-weight:700;color:var(--text-main);margin-bottom:4px;}
+  .section-desc{font-size:0.8rem;color:var(--text-muted);margin-bottom:18px;}
+
+  .speaking-bar{display:none;align-items:center;gap:10px;background:#d4e4ff;border:2px solid var(--accent);border-radius:12px;padding:10px 18px;margin-bottom:18px;font-size:0.82rem;font-weight:700;color:var(--accent);}
+  .speaking-bar.visible{display:flex;animation:fadeUp 0.2s ease;}
+  .wave{display:flex;gap:3px;align-items:center;height:18px;}
+  .wave span{display:block;width:3px;background:var(--accent);border-radius:2px;animation:wb 0.55s ease-in-out infinite;}
+  .wave span:nth-child(1){height:5px;animation-delay:0s}
+  .wave span:nth-child(2){height:13px;animation-delay:0.1s}
+  .wave span:nth-child(3){height:8px;animation-delay:0.2s}
+  .wave span:nth-child(4){height:15px;animation-delay:0.15s}
+  .wave span:nth-child(5){height:5px;animation-delay:0.05s}
+  @keyframes wb{0%,100%{transform:scaleY(1)}50%{transform:scaleY(0.35)}}
+
+  /* ===== GREETINGS ===== */
+  .greet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;}
+  .greet-card{background:var(--white);border:2px solid var(--border);border-radius:14px;padding:16px 18px;cursor:pointer;position:relative;transition:all 0.2s;box-shadow:0 1px 5px rgba(0,0,0,0.06);}
+  .greet-card:hover{border-color:var(--accent);transform:translateY(-2px);background:var(--surface);}
+  .greet-card.playing{border-color:var(--accent);background:var(--playing-bg);}
+  .greet-play{position:absolute;top:12px;right:14px;width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);background:#eef1f8;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--accent);transition:all 0.2s;}
+  .greet-card:hover .greet-play,.greet-card.playing .greet-play{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .greet-fr{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--text-main);margin-bottom:4px;padding-right:30px;}
+  .greet-zh{font-size:0.82rem;color:var(--accent);font-weight:600;margin-bottom:3px;}
+  .greet-ipa{font-size:0.74rem;color:var(--text-muted);font-style:italic;}
+
+  /* ===== DIALOGUE BLOCK ===== */
+  .sub-tabs-wrapper{background:var(--white);border:2px solid var(--border);border-radius:14px;padding:12px 14px;margin-bottom:18px;box-shadow:0 1px 6px rgba(0,0,0,0.05);}
+  .sub-tabs-label{font-size:0.72rem;font-weight:700;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;}
+  .sub-tabs{display:flex;gap:7px;flex-wrap:wrap;}
+  .sub-tab-btn{flex-shrink:0;padding:7px 14px;border:1.5px solid var(--border);background:var(--surface);color:var(--text-sub);font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;border-radius:20px;transition:all 0.2s;}
+  .sub-tab-btn:hover{border-color:var(--accent);color:var(--accent);background:#eef2ff;}
+  .sub-tab-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+  .dialogue-block{background:var(--white);border:2px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);margin-bottom:0;}
+  .dialogue-topic{padding:11px 18px;font-size:0.82rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fff;}
+
+  /* Each sentence row */
+  .sent-row{border-bottom:1px solid #eef0f8;}
+  .sent-row:last-child{border-bottom:none;}
+
+  .sent-main{display:flex;align-items:flex-start;padding:13px 18px;gap:12px;cursor:pointer;transition:background 0.15s;user-select:none;}
+  .sent-main:hover{background:#f4f7ff;}
+  .sent-main.playing{background:var(--playing-bg);}
+
+  .speaker-tag{flex-shrink:0;font-size:0.7rem;font-weight:700;padding:3px 9px;border-radius:20px;margin-top:3px;}
+  .tag-a{background:#1a3a8f;color:#fff;}
+  .tag-b{background:#c0392b;color:#fff;}
+  .tag-ann{background:#455a64;color:#fff;}
+
+  .sent-body{flex:1;min-width:0;}
+  .sent-fr{font-family:'Playfair Display',serif;font-size:1.05rem;color:#0a0a1a;font-weight:700;margin-bottom:3px;}
+  .sent-zh{font-size:0.83rem;color:var(--accent);font-weight:600;margin-bottom:0;}
+
+  .sent-controls{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-top:2px;}
+  .btn-play{width:32px;height:32px;background:#e8edf8;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--accent);transition:all 0.2s;border:1.5px solid var(--border);cursor:pointer;flex-shrink:0;}
+  .sent-main:hover .btn-play,.sent-main.playing .btn-play{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .btn-expand{width:28px;height:28px;background:transparent;border:1.5px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text-muted);cursor:pointer;transition:all 0.2s;flex-shrink:0;}
+  .btn-expand:hover{border-color:var(--gold);color:var(--gold);background:#fffbf0;}
+  .btn-expand.open{background:var(--gold);border-color:var(--gold);color:#fff;}
+
+  /* Detail panel */
+  .sent-detail{display:none;padding:0 18px 16px 18px;border-top:1px dashed #dde3f0;background:#fafbff;animation:fadeUp 0.2s ease;}
+  .sent-detail.open{display:block;}
+
+  /* Grammar box */
+  .detail-grammar{
+    background:#fffbf0;border:1.5px solid #e8d08a;border-radius:10px;
+    padding:12px 14px;margin-bottom:10px;margin-top:12px;
+  }
+  .detail-grammar-title{font-size:0.72rem;font-weight:700;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+  .detail-grammar-body{font-size:0.8rem;color:#3d2800;line-height:1.7;}
+  .detail-grammar-body b{color:#8b5e00;}
+
+  /* Vocab chips */
+  .detail-vocab-title{font-size:0.72rem;font-weight:700;color:var(--purple);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+  .vocab-chips{display:flex;flex-wrap:wrap;gap:8px;}
+  .vocab-chip{
+    background:#f3eeff;border:1.5px solid #c4a8ee;border-radius:10px;
+    padding:7px 12px;font-size:0.78rem;
+  }
+  .vocab-word{font-family:'Playfair Display',serif;font-weight:700;color:var(--purple);font-size:0.9rem;}
+  .vocab-pos{font-size:0.65rem;color:var(--text-muted);font-style:italic;margin:1px 0;}
+  .vocab-def{font-size:0.76rem;color:var(--text-sub);font-weight:600;}
+  .vocab-note{font-size:0.7rem;color:var(--text-muted);margin-top:2px;}
+
+  /* Structure box */
+  .detail-struct{
+    background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;
+    padding:12px 14px;margin-top:10px;
+  }
+  .detail-struct-title{font-size:0.72rem;font-weight:700;color:var(--green);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+  .struct-parts{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+  .struct-part{background:#fff;border:1.5px solid #86efac;border-radius:8px;padding:5px 10px;text-align:center;}
+  .struct-fr{font-family:'Playfair Display',serif;font-size:0.85rem;font-weight:700;color:var(--green);}
+  .struct-role{font-size:0.62rem;color:var(--text-muted);margin-top:2px;}
+  .struct-note{font-size:0.76rem;color:#1a4731;line-height:1.6;}
+
+  /* ===== ALPHABET ===== */
+  .voice-bar{display:flex;align-items:center;gap:10px;background:var(--white);border:2px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:18px;flex-wrap:wrap;box-shadow:0 1px 5px rgba(0,0,0,0.05);}
+  .voice-bar-label{font-size:0.78rem;font-weight:700;color:var(--text-muted);letter-spacing:0.5px;margin-right:4px;}
+  .voice-divider{width:1px;height:24px;background:var(--border);margin:0 4px;}
+  .voice-chip{padding:6px 14px;border:1.5px solid var(--border);background:var(--surface);color:var(--text-sub);font-size:0.78rem;font-weight:600;cursor:pointer;border-radius:20px;transition:all 0.2s;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:5px;text-decoration:none;}
+  .voice-chip:hover{border-color:var(--accent);color:var(--accent);}
+  .voice-chip.forvo-chip{border-color:#e67e22;color:#c05e00;}
+  .voice-chip.forvo-chip:hover{background:#fff3e0;border-color:#e67e22;}
+  #voiceSelect{flex:1;min-width:160px;padding:7px 12px;border:1.5px solid var(--border);border-radius:20px;background:var(--surface);color:var(--text-main);font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;outline:none;}
+  #voiceSelect:focus{border-color:var(--accent);}
+  .alpha-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;}
+  .alpha-card{background:var(--white);border:2px solid var(--border);border-radius:14px;padding:14px 8px 12px;cursor:pointer;text-align:center;transition:all 0.2s;box-shadow:0 1px 4px rgba(0,0,0,0.05);}
+  .alpha-card:hover{border-color:var(--accent);transform:translateY(-2px);background:var(--surface);}
+  .alpha-card.playing{border-color:var(--accent);background:var(--playing-bg);}
+  .alpha-letter{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--accent);font-weight:700;line-height:1;margin-bottom:6px;}
+  .alpha-name{font-size:0.78rem;font-weight:700;color:var(--text-main);margin-bottom:3px;}
+  .alpha-ipa{font-size:0.65rem;color:var(--text-muted);font-style:italic;margin-bottom:4px;}
+  .alpha-hint{font-size:0.65rem;color:var(--accent2);font-weight:700;margin-bottom:4px;}
+  .alpha-example{font-size:0.63rem;color:var(--green);font-weight:600;}
+  .alpha-ex-btn{display:inline-flex;align-items:center;gap:3px;margin-top:6px;padding:3px 8px;background:#e8f5e9;border:1px solid var(--green);border-radius:10px;font-size:0.6rem;font-weight:700;color:var(--green);cursor:pointer;transition:all 0.15s;font-family:'DM Sans',sans-serif;}
+  .alpha-ex-btn:hover,.alpha-ex-btn.playing{background:var(--green);color:#fff;border-color:var(--green);}
+
+  /* ===== NUMBERS ===== */
+  .num-filter{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+  .num-filter-btn{padding:7px 16px;border:2px solid var(--border);background:var(--white);color:var(--text-sub);font-size:0.8rem;font-weight:600;cursor:pointer;border-radius:20px;transition:all 0.2s;font-family:'DM Sans',sans-serif;}
+  .num-filter-btn.active,.num-filter-btn:hover{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .num-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;}
+  .num-card{background:var(--white);border:2px solid var(--border);border-radius:12px;padding:13px 10px;cursor:pointer;text-align:center;transition:all 0.2s;box-shadow:0 1px 4px rgba(0,0,0,0.05);}
+  .num-card:hover{border-color:var(--accent);transform:translateY(-2px);background:var(--surface);}
+  .num-card.playing{border-color:var(--accent);background:var(--playing-bg);}
+  .num-digit{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--accent);font-weight:700;line-height:1;margin-bottom:5px;}
+  .num-french{font-size:0.78rem;color:var(--text-main);font-weight:600;line-height:1.3;}
+
+  .tip{margin-top:20px;padding:14px 18px;background:#fff8e1;border-left:4px solid var(--gold);border-radius:0 10px 10px 0;font-size:0.8rem;color:#3d2800;line-height:1.7;}
+  .tip strong{color:var(--gold);}
+
+  /* ===== MONTHS ===== */
+  .months-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;}
+  .month-card{
+    background:var(--white);border:2px solid var(--border);
+    border-radius:14px;padding:16px 14px 14px;cursor:pointer;
+    position:relative;transition:all 0.2s;
+    box-shadow:0 1px 5px rgba(0,0,0,0.06);
+  }
+  .month-card:hover{border-color:var(--accent);transform:translateY(-2px);background:var(--surface);}
+  .month-card.playing{border-color:var(--accent);background:var(--playing-bg);}
+  .month-num{
+    font-size:0.68rem;font-weight:700;color:var(--text-muted);
+    letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;
+  }
+  .month-fr{
+    font-family:'Playfair Display',serif;font-size:1.15rem;
+    font-weight:700;color:var(--text-main);margin-bottom:3px;
+  }
+  .month-zh{font-size:0.8rem;color:var(--accent);font-weight:600;margin-bottom:5px;}
+  .month-ipa{font-size:0.7rem;color:var(--text-muted);font-style:italic;margin-bottom:2px;}
+  .month-bpm{font-size:0.72rem;color:var(--accent2);font-weight:700;}
+  .month-play{
+    position:absolute;top:12px;right:12px;
+    width:26px;height:26px;border-radius:50%;
+    border:1.5px solid var(--border);background:#eef1f8;
+    display:flex;align-items:center;justify-content:center;
+    font-size:9px;color:var(--accent);transition:all 0.2s;
+  }
+  .month-card:hover .month-play,.month-card.playing .month-play{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+  /* IPA + BPM on greet cards */
+  .greet-bpm{font-size:0.7rem;color:var(--accent2);font-weight:700;margin-top:1px;}
+
+  /* Audio source badge */
+  .audio-badge{
+    display:inline-block;font-size:0.6rem;font-weight:700;
+    padding:2px 6px;border-radius:8px;margin-bottom:4px;
+    letter-spacing:0.3px;
+  }
+  .audio-badge.wiki{background:#e8f5e9;color:#1b5e20;border:1px solid #a5d6a7;}
+  .audio-badge.tts{background:#e3f2fd;color:#0d47a1;border:1px solid #90caf9;}
+
+  /* IPA + BPM on sent rows */
+  .sent-ipa{font-size:0.72rem;color:var(--text-muted);font-style:italic;margin-top:2px;}
+  .sent-bpm{font-size:0.72rem;color:var(--accent2);font-weight:700;margin-top:1px;}
+
+  /* IPA + BPM on vocab chips */
+  .vocab-ipa{font-size:0.67rem;color:var(--text-muted);font-style:italic;margin-top:2px;font-family:'Playfair Display',serif;}
+  .vocab-bpm{font-size:0.68rem;color:var(--accent2);font-weight:700;margin-top:1px;letter-spacing:0.3px;}
+
+  @media(max-width:480px){
+    .greet-grid{grid-template-columns:1fr 1fr;}
+    .alpha-grid{grid-template-columns:repeat(4,1fr);}
+    .num-grid{grid-template-columns:repeat(3,1fr);}
+    .vocab-chips{gap:6px;}
+    .struct-parts{gap:4px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="flag-row"><span class="fb"></span><span class="fw"></span><span class="fr2"></span></div>
+    <h1>Bonjour!</h1>
+    <p>法語基礎學習 · Apprendre le Français</p>
+  </header>
+
+  <div id="speakingBar" class="speaking-bar">
+    <div class="wave"><span></span><span></span><span></span><span></span><span></span></div>
+    <span id="speakingText">正在播放...</span>
+  </div>
+
+  <!-- 🌐 公用語音選擇器 -->
+  <div class="voice-bar" style="margin-bottom:18px;">
+    <span class="voice-bar-label">🔊 語音：</span>
+    <select id="voiceSelect" onchange="setVoiceFromSelect(this)"><option value="-1">載入中…</option></select>
+    <div class="voice-divider"></div>
+    <a class="voice-chip forvo-chip" href="https://forvo.com/languages/fr/" target="_blank" rel="noopener">🎙 Forvo 真人 ↗</a>
+  </div>
+
+  <div class="main-tabs">
+    <button class="tab-btn active" onclick="showMain('greetings',this)">👋 基本問候</button>
+    <button class="tab-btn" onclick="showMain('dialogues',this)">💬 情境對話</button>
+    <button class="tab-btn" onclick="showMain('metro',this)">🚇 地鐵廣播</button>
+    <button class="tab-btn" onclick="showMain('alphabet',this)">🔤 字母發音</button>
+    <button class="tab-btn" onclick="showMain('numbers',this)">🔢 數字</button>
+    <button class="tab-btn" onclick="showMain('months',this)">📅 月份</button>
+  </div>
+
+  <!-- GREETINGS -->
+  <div id="greetings" class="section active">
+    <div class="section-title">👋 基本問候語</div>
+    <div class="section-desc">點擊卡片即可聆聽發音</div>
+    <div class="greet-grid" id="greetGrid"></div>
+    <div class="tip"><strong>💡 小提示：</strong>字尾輔音通常不發音（如 bonjour 的 r 輕發）。正式場合用 <b>vous</b>，熟人用 <b>tu</b>。</div>
+  </div>
+
+  <!-- DIALOGUES -->
+  <div id="dialogues" class="section">
+    <div class="section-title">💬 進階情境對話</div>
+    <div class="section-desc">▶ 點句子播放發音　📖 點 <b>＋</b> 展開單字與文法說明</div>
+    <div class="sub-tabs-wrapper">
+      <div class="sub-tabs-label">選擇情境</div>
+      <div class="sub-tabs" id="subTabs"></div>
+    </div>
+    <div id="dialogueContent"></div>
+    <div class="tip"><strong>💡 語法：</strong>否定句用「ne … pas」夾住動詞。<b>Je ne sais pas</b>（我不知道）。動詞隨人稱變化是法語核心規則。</div>
+  </div>
+
+  <!-- METRO -->
+  <div id="metro" class="section">
+    <div class="section-title">🚇 地鐵廣播常用語句</div>
+    <div class="section-desc">▶ 點句子播放發音　📖 點 <b>＋</b> 展開單字與文法說明</div>
+    <div id="metroContainer"></div>
+    <div class="tip"><strong>💡 關鍵詞：</strong><b>prochain arrêt</b>（下一站）、<b>correspondance</b>（換乘）、<b>fermeture des portes</b>（關門）、<b>perturbé</b>（服務受影響）、<b>terminus</b>（終點站，全部人下車）。</div>
+  </div>
+
+  <!-- ALPHABET -->
+  <div id="alphabet" class="section">
+    <div class="section-title">🔤 法語字母</div>
+    <div class="section-desc">點卡片聽字母名稱發音（如 R = "Air"）；點綠色按鈕聽範例單字</div>
+    <div class="alpha-grid" id="alphaGrid"></div>
+    <div class="tip"><strong>💡 發音：</strong><b>H</b> 通常不發音。<b>R</b> 是喉音，從喉嚨振動。<b>U</b> 嘴型圓如ㄨ但舌位如ㄧ。兩母音間的 <b>S</b> 發 Z 音（如 maison）。</div>
+  </div>
+
+  <!-- NUMBERS -->
+  <div id="numbers" class="section">
+    <div class="section-title">🔢 數字 1–100</div>
+    <div class="section-desc">點擊數字聆聽法語發音</div>
+    <div class="num-filter">
+      <button class="num-filter-btn active" onclick="filterNums('all',this)">全部</button>
+      <button class="num-filter-btn" onclick="filterNums('1-20',this)">1–20</button>
+      <button class="num-filter-btn" onclick="filterNums('21-60',this)">21–60</button>
+      <button class="num-filter-btn" onclick="filterNums('61-100',this)">61–100</button>
+    </div>
+    <div class="num-grid" id="numGrid"></div>
+    <div class="tip"><strong>💡 特色：</strong>70 = soixante-dix（60+10）、80 = quatre-vingts（4×20）、90 = quatre-vingt-dix（4×20+10）。源自古高盧語20進位制。</div>
+  </div>
+
+  <!-- MONTHS -->
+  <div id="months" class="section">
+    <div class="section-title">📅 月份 · Les Mois</div>
+    <div class="section-desc">點擊月份卡片聆聽法語發音</div>
+    <div class="months-grid" id="monthsGrid"></div>
+    <div class="tip"><strong>💡 法語月份：</strong>法語月份全部是陽性（le janvier）。說「在某月」用 <b>en</b> + 月份：en janvier（在一月）。注意法語月份<b>首字母不大寫</b>（和英語不同！）</div>
+  </div>
+</div>
+
+<script>
+// ======================================================
+// DATA
+// ======================================================
+
+const greetings = [
+  {fr:"Bonjour",zh:"你好 / 早安",ipa:"bɔ̃-ʒuʁ",bpm:"崩-入喝"},
+  {fr:"Bonsoir",zh:"晚安（問候）",ipa:"bɔ̃-swaʁ",bpm:"崩-ㄙㄨㄚ喝"},
+  {fr:"Bonne nuit",zh:"晚安（道別）",ipa:"bɔn nɥi",bpm:"崩 妞依"},
+  {fr:"Salut",zh:"嗨／你好（非正式）",ipa:"sa-ly",bpm:"撒-呂"},
+  {fr:"Au revoir",zh:"再見",ipa:"o ʁə-vwaʁ",bpm:"歐 喝乏喝"},
+  {fr:"À bientôt",zh:"待會見",ipa:"a bjɛ̃-to",bpm:"阿 逼昂-托"},
+  {fr:"À tout à l'heure",zh:"等一下見",ipa:"a tu ta lœʁ",bpm:"阿 禿 塔 勒喝"},
+  {fr:"Comment ça va ?",zh:"你好嗎？",ipa:"kɔ-mɑ̃ sa va",bpm:"口-芒 撒 乏"},
+  {fr:"Ça va bien, merci.",zh:"我很好，謝謝。",ipa:"sa va bjɛ̃ mɛʁ-si",bpm:"撒乏逼昂 妹喝-希"},
+  {fr:"Pas mal, et toi ?",zh:"還不錯，你呢？",ipa:"pa mal e twa",bpm:"吧 媽勒 ㄝ 托ㄚ"},
+  {fr:"Merci beaucoup",zh:"非常感謝",ipa:"mɛʁ-si bo-ku",bpm:"妹喝-希 波-姑"},
+  {fr:"De rien",zh:"不客氣",ipa:"də ʁjɛ̃",bpm:"德 喝ㄧ昂"},
+  {fr:"S'il vous plaît",zh:"請（正式）",ipa:"sil vu plɛ",bpm:"希爾 夫 普類"},
+  {fr:"Excusez-moi",zh:"對不起",ipa:"ɛk-sky-ze mwa",bpm:"ㄝ克-斯姬-賊 摩ㄚ"},
+  {fr:"Je m'appelle…",zh:"我叫……",ipa:"ʒə ma-pɛl",bpm:"惹 嗎-配勒"},
+  {fr:"Enchanté(e)",zh:"幸會",ipa:"ɑ̃-ʃɑ̃-te",bpm:"昂-ㄒㄩ昂-帖"},
+  {fr:"Bonne chance !",zh:"祝你好運！",ipa:"bɔn ʃɑ̃s",bpm:"崩 ㄒㄩ昂斯"},
+  {fr:"À votre santé !",zh:"乾杯！",ipa:"a vɔtʁ sɑ̃-te",bpm:"阿 佛特喝 ㄙㄤ-帖"},
+];
+
+// Each line: fr, zh, vocab[], grammar{pattern,note}, struct{parts[],note}
+const dialogues = [
+ {id:"cafe",icon:"☕",topic:"咖啡廳點餐",color:"#5c3200",lines:[
+  {s:"A",fr:"Bonjour, vous désirez ?",zh:"您好，請問您要點什麼？",
+   ipa:"bɔ̃-ʒuʁ vu de-zi-ʁe",bpm:"崩-入喝 夫 ㄉㄝ-ㄗㄧ-喝ㄝ",
+   vocab:[
+     {w:"Bonjour",pos:"感嘆詞",ipa:"bɔ̃-ʒuʁ",bpm:"崩-入喝",def:"你好／早安",note:"正式問候，適用早上至傍晚"},
+     {w:"vous",pos:"代名詞",ipa:"vu",bpm:"夫",def:"您（正式）/ 你們",note:"單數正式用法，比 tu 更禮貌"},
+     {w:"désirez",pos:"動詞",ipa:"de-zi-ʁe",bpm:"ㄉㄝ-ㄗㄧ-喝ㄝ",def:"想要、希望",note:"désirer 的 vous 現在式變化；比 voulez 更正式、服務業常用"},
+   ],
+   grammar:{pattern:"Vous + [動詞現在式] ?",note:"疑問語調上揚即可構成疑問句，這是口語最常見的問法。正式寫法為：Que désirez-vous ?（倒裝）"},
+   struct:[{fr:"vous",role:"主語 (vous)"},{fr:"désirez",role:"動詞 désirer"}],
+   structnote:"省略了疑問詞 Que（什麼），直接用語調上揚表示疑問，是口語中最自然的說法。"
+  },
+  {s:"B",fr:"Je voudrais un café crème, s'il vous plaît.",zh:"我想要一杯拿鐵，麻煩您。",
+   ipa:"ʒə vu-dʁɛ œ̃ ka-fe kʁɛm sil vu plɛ",bpm:"惹 夫-ㄉ喝ㄝ 昂 咖-ㄈㄝ克ㄌㄝ 希爾夫普類",
+   vocab:[
+     {w:"voudrais",pos:"動詞",ipa:"vu-dʁɛ",bpm:"夫-ㄉ喝ㄝ",def:"想要（禮貌）",note:"vouloir 的條件式（conditionnel）= would like，比 je veux（我要）更有禮貌"},
+     {w:"un café crème",pos:"名詞片語",ipa:"œ̃ ka-fe kʁɛm",bpm:"昂 咖-ㄈㄝ 克ㄌㄝ姆",def:"拿鐵咖啡",note:"法國咖啡廳標配；un = 一個（不定冠詞）"},
+     {w:"s'il vous plaît",pos:"慣用語",ipa:"sil vu plɛ",bpm:"希爾 夫 普類",def:"請、麻煩您",note:"字面：if it pleases you；簡寫 SVP"},
+   ],
+   grammar:{pattern:"Je voudrais + [名詞], s'il vous plaît.",note:"條件式（Conditionnel présent）在點餐、請求時使用，語氣比現在式更委婉。vouloir → je voudrais / tu voudrais / il voudrait"},
+   struct:[{fr:"Je",role:"主語"},{fr:"voudrais",role:"動詞（條件式）"},{fr:"un café crème",role:"受詞"},{fr:"s'il vous plaît",role:"禮貌附加語"}],
+   structnote:"句尾加 s'il vous plaît 是法語點餐/請求的標準句型，缺少會顯得較無禮。"
+  },
+  {s:"A",fr:"Grande ou petite taille ?",zh:"大杯還是小杯？",
+   ipa:"ɡʁɑ̃d u pə-tit taj",bpm:"ㄍ喝昂德 烏 ㄆㄝ-提 塔依",
+   vocab:[
+     {w:"grande",pos:"形容詞",ipa:"ɡʁɑ̃d",bpm:"ㄍ喝昂德",def:"大的（陰性）",note:"grand/grande，形容詞隨名詞性別變化"},
+     {w:"petite",pos:"形容詞",ipa:"pə-tit",bpm:"ㄆㄝ-提特",def:"小的（陰性）",note:"petit/petite；taille 是陰性名詞，所以形容詞加 -e"},
+     {w:"taille",pos:"名詞（陰性）",ipa:"taj",bpm:"塔依",def:"尺寸、大小",note:"也可指人的身高或衣服尺寸"},
+     {w:"ou",pos:"連接詞",ipa:"u",bpm:"烏",def:"或是、還是",note:"選擇問句連接詞，注意不要和 où（哪裡）混淆"},
+   ],
+   grammar:{pattern:"[選項A] ou [選項B] ?",note:"省略句：完整說法為 Vous désirez une grande taille ou une petite taille ? 口語中常省略重複部分"},
+   struct:[{fr:"Grande",role:"選項 A（陰性形容詞）"},{fr:"ou",role:"或是（連接詞）"},{fr:"petite taille",role:"選項 B"}],
+   structnote:"注意 taille 是陰性名詞（la taille），所以用 grande 而非 grand。法語形容詞必須與名詞的性別和數一致。"
+  },
+  {s:"B",fr:"Grande, s'il vous plaît. Et un pain au chocolat aussi.",zh:"大杯謝謝。還有一個巧克力麵包。",
+   ipa:"ɡʁɑ̃d sil vu plɛ e œ̃ pɛ̃ o ʃɔ-kɔ-la o-si",bpm:"ㄍ喝昂德 希夫普類 ㄝ昂 帕昂歐 巧-口-拉 歐-希",
+   vocab:[
+     {w:"un pain au chocolat",pos:"名詞片語",ipa:"œ̃ pɛ̃ o ʃɔ-kɔ-la",bpm:"昂 帕昂 歐 巧口拉",def:"巧克力麵包",note:"法國麵包店必備，南法稱 chocolatine；au = à + le 的縮寫"},
+     {w:"et",pos:"連接詞",ipa:"e",bpm:"ㄝ",def:"和、還有",note:"並列連接詞，發音 [e]，結尾 t 不發音"},
+     {w:"aussi",pos:"副詞",ipa:"o-si",bpm:"歐-希",def:"也、還有",note:"放句尾表示「也要這個」"},
+   ],
+   grammar:{pattern:"[名詞], [請求] + Et [名詞] aussi.",note:"au 是縮合冠詞：à + le → au（陽性）；à + la 不縮寫，à + les → aux（複數）"},
+   struct:[{fr:"Grande",role:"簡短回應"},{fr:"Et",role:"連接（還有）"},{fr:"un pain au chocolat",role:"追加點餐"},{fr:"aussi",role:"副詞（也）"}],
+   structnote:"口語點餐常用「先回答 + Et ... aussi」結構追加品項，自然又有禮貌。"
+  },
+  {s:"A",fr:"Pour consommer sur place ou à emporter ?",zh:"內用還是外帶？",
+   ipa:"puʁ kɔ̃-sɔ-me syʁ plas u a ɑ̃-pɔʁ-te",bpm:"普喝 口-ㄙㄛ-ㄇㄝ 希爾 普拉斯 烏 阿 昂-波喝-帖",
+   vocab:[
+     {w:"pour",pos:"介系詞",ipa:"puʁ",bpm:"普喝",def:"為了、目的",note:"此處引導目的狀語"},
+     {w:"consommer",pos:"動詞",ipa:"kɔ̃-sɔ-me",bpm:"口-ㄙㄛ-ㄇㄝ",def:"消費、食用",note:"指在店內食用；名詞 consommation = 消費"},
+     {w:"sur place",pos:"副詞片語",ipa:"syʁ plas",bpm:"希爾 普拉斯",def:"在原地、內用",note:"字面：在這個地方；英文對應 dine in"},
+     {w:"à emporter",pos:"副詞片語",ipa:"a ɑ̃-pɔʁ-te",bpm:"阿 昂-波喝-帖",def:"外帶",note:"字面：帶走；emporter = em（往外）+ porter（攜帶）"},
+   ],
+   grammar:{pattern:"Pour [不定式] sur place ou à emporter ?",note:"Pour + 動詞不定式 = 為了做某事。這是服務業超高頻問句，要能立刻反應！"},
+   struct:[{fr:"Pour consommer",role:"目的（pour + 不定式）"},{fr:"sur place",role:"選項 A（內用）"},{fr:"ou",role:"或是"},{fr:"à emporter",role:"選項 B（外帶）"}],
+   structnote:"兩個固定片語必記：sur place（內用）vs à emporter（外帶）。到任何法國餐廳、咖啡廳必聽到這句。"
+  },
+  {s:"B",fr:"Sur place. L'addition, c'est combien ?",zh:"內用。請問總共多少錢？",
+   ipa:"syʁ plas la-di-sjɔ̃ sɛ kɔ̃-bjɛ̃",bpm:"希爾普拉斯 拉-ㄉㄧ-ㄒㄩㄥ ㄙㄝ 口-逼昂",
+   vocab:[
+     {w:"l'addition",pos:"名詞（陰性）",ipa:"la-di-sjɔ̃",bpm:"拉-ㄉㄧ-ㄒㄩㄥ",def:"帳單",note:"l' 是定冠詞 la 在母音前的縮寫；字面是「加法」，引申為帳單"},
+     {w:"c'est",pos:"動詞片語",ipa:"sɛ",bpm:"ㄙㄝ",def:"是、這是",note:"ce + est 的縮寫；c'est 是法語最高頻詞組之一"},
+     {w:"combien",pos:"疑問副詞",ipa:"kɔ̃-bjɛ̃",bpm:"口-逼昂",def:"多少",note:"用於詢問數量或金額；Combien coûte...? = ...要多少錢？"},
+   ],
+   grammar:{pattern:"C'est combien ?",note:"最簡潔的問價句型。完整說法：Quel est le prix ? 或 Combien coûte-t-il ? 口語直接說 C'est combien ? 最自然"},
+   struct:[{fr:"L'addition",role:"主語（帳單）"},{fr:"c'est",role:"動詞（是）"},{fr:"combien",role:"疑問詞（多少）"}],
+   structnote:"l' 是縮合：la + addition → l'addition（因 addition 以母音開頭）。法語冠詞在母音前必須省音加撇號。"
+  },
+ ]},
+ {id:"metro_dlg",icon:"🚇",topic:"問路與交通",color:"#003d1a",lines:[
+  {s:"A",fr:"Excusez-moi, je cherche le musée du Louvre.",zh:"對不起，我在找羅浮宮。",
+   vocab:[
+     {w:"excusez-moi",pos:"慣用語",def:"對不起、打擾一下",note:"excuser（原諒）的命令式；用於引起注意或道歉；非正式：excuse-moi"},
+     {w:"cherche",pos:"動詞",def:"在找、在尋找",note:"chercher 的第一人稱現在式（je cherche）；英文 to search / to look for"},
+     {w:"le musée",pos:"名詞（陽性）",def:"博物館",note:"le = 定冠詞（陽性）；musée 陽性名詞"},
+     {w:"du",pos:"縮合冠詞",def:"的（陽性）",note:"de + le → du；羅浮宮 = le Louvre，所以是 musée du Louvre"},
+   ],
+   grammar:{pattern:"Je cherche + [le/la/les] + [名詞].",note:"chercher 是規則 -er 動詞，現在式：je cherche / tu cherches / il cherche / nous cherchons / vous cherchez / ils cherchent"},
+   struct:[{fr:"Excusez-moi",role:"禮貌引語"},{fr:"je",role:"主語"},{fr:"cherche",role:"動詞"},{fr:"le musée du Louvre",role:"受詞"}],
+   structnote:"du 是縮合冠詞（de + le）。法語介系詞 de 遇到陽性定冠詞 le 必須縮寫成 du。遇到 les 則縮寫成 des。"
+  },
+  {s:"B",fr:"Prenez le métro ligne un, direction La Défense.",zh:"搭一號線，方向是拉德芳斯。",
+   vocab:[
+     {w:"prenez",pos:"動詞",def:"請搭乘、請取",note:"prendre（搭乘/拿）的 vous 命令式；重要交通動詞"},
+     {w:"le métro",pos:"名詞（陽性）",def:"地鐵",note:"法語全稱 le métropolitain；巴黎地鐵系統 RATP"},
+     {w:"ligne",pos:"名詞（陰性）",def:"路線",note:"la ligne；巴黎地鐵共 16 條線（1–14 + 3bis + 7bis）"},
+     {w:"direction",pos:"名詞（陰性）",def:"方向、終點方向",note:"地鐵廣播關鍵字：告知列車開往的方向（終點站名稱）"},
+   ],
+   grammar:{pattern:"Prenez + [交通工具] + [路線], direction [終點站].",note:"命令式（Impératif）：vous → prenez / tu → prends / nous → prenons。命令式動詞置於句首，主語省略。"},
+   struct:[{fr:"Prenez",role:"命令式動詞"},{fr:"le métro ligne un",role:"交通工具＋路線"},{fr:"direction La Défense",role:"方向（終點站）"}],
+   structnote:"direction + 終點站名 是說明搭乘方向的固定用法，不加介系詞。這是巴黎地鐵廣播的標準格式。"
+  },
+  {s:"A",fr:"Combien d'arrêts d'ici ?",zh:"從這裡要幾站？",
+   vocab:[
+     {w:"combien",pos:"疑問副詞",def:"多少（數量）",note:"combien de + 名詞 = 多少個...；d' 是 de 的母音縮寫"},
+     {w:"arrêts",pos:"名詞（陽性複數）",def:"站、停靠站",note:"un arrêt（一站）/ des arrêts（多站）；動詞：s'arrêter（停下）"},
+     {w:"d'ici",pos:"副詞片語",def:"從這裡",note:"de + ici；ici = here；從這個地點出發的距離"},
+   ],
+   grammar:{pattern:"Combien de + [名詞複數] + [地點/方向] ?",note:"完整句：Il y a combien d'arrêts d'ici jusqu'à...? 口語中大量省略，直接問關鍵詞。省略號越多越像母語者！"},
+   struct:[{fr:"Combien",role:"疑問詞（多少）"},{fr:"d'arrêts",role:"de + 名詞（站）"},{fr:"d'ici",role:"de + ici（從這裡）"}],
+   structnote:"combien + de 後面的名詞不用冠詞：combien de stations（幾站），de 直接接名詞。"
+  },
+  {s:"B",fr:"Trois arrêts. Descendez à Palais-Royal.",zh:"三站。在皇家宮殿站下車。",
+   vocab:[
+     {w:"descendez",pos:"動詞",def:"請下車、請下去",note:"descendre（下降、下車）的 vous 命令式；反義 montez（上車）"},
+     {w:"à",pos:"介系詞",def:"在（地點）",note:"表示地點時用 à；à Paris（在巴黎）、à la gare（在車站）"},
+   ],
+   grammar:{pattern:"Descendez à + [站名/地點].",note:"descendre 是 -re 動詞（不規則），命令式 vous：descendez / tu：descends。下車說 descendre，上車說 monter。"},
+   struct:[{fr:"Trois arrêts",role:"簡短回答（數量）"},{fr:"Descendez",role:"命令式動詞"},{fr:"à Palais-Royal",role:"地點（à + 站名）"}],
+   structnote:"地鐵相關動詞：prendre（搭）、descendre（下車）、monter（上車）、changer（換乘）。熟記這四個就能應付大多數狀況。"
+  },
+  {s:"A",fr:"Est-ce qu'il faut valider le ticket à chaque fois ?",zh:"每次都要刷票嗎？",
+   vocab:[
+     {w:"est-ce que",pos:"疑問結構",def:"是不是...？",note:"最通用的疑問句引導詞，後面直接接正常語序，不需倒裝"},
+     {w:"il faut",pos:"非人稱動詞",def:"必須、需要",note:"falloir 的非人稱形式，固定搭配 il faut + 不定式；非常高頻"},
+     {w:"valider",pos:"動詞",def:"刷票、驗票",note:"法國交通必知動詞！不刷票被查到 = 罰款（amende）"},
+     {w:"à chaque fois",pos:"副詞片語",def:"每次",note:"chaque = each/every；chaque fois = every time"},
+   ],
+   grammar:{pattern:"Est-ce qu'il faut + [動詞不定式] ?",note:"il faut（必須）是 falloir 的非人稱式，永遠用 il 作主語，沒有人稱變化。il faut + 不定式 / il faut + 名詞"},
+   struct:[{fr:"Est-ce que",role:"疑問引導詞"},{fr:"il faut",role:"非人稱動詞（必須）"},{fr:"valider",role:"動詞不定式"},{fr:"le ticket",role:"受詞"},{fr:"à chaque fois",role:"時間副詞（每次）"}],
+   structnote:"est-ce que 讓你不用倒裝就能問問題，是最口語化的疑問句型。疑問程度：est-ce que（口語）> 倒裝（正式）> 上揚語調（最口語）。"
+  },
+  {s:"B",fr:"Oui, sinon c'est une amende.",zh:"是的，不然會被罰款。",
+   vocab:[
+     {w:"sinon",pos:"連接詞",def:"否則、不然",note:"si + non 的縮合；英文 otherwise；連接假設後果"},
+     {w:"amende",pos:"名詞（陰性）",def:"罰款",note:"une amende = a fine；在法國逃票罰款高達 €50 起"},
+     {w:"c'est",pos:"動詞片語",def:"是、這就是",note:"ce + est；後面接名詞時用不定冠詞：c'est une amende"},
+   ],
+   grammar:{pattern:"Sinon, c'est + [結果].",note:"sinon 後面省略了條件句，完整說法：Si vous ne validez pas, c'est une amende.（如果你不刷票，就會被罰款）口語中條件部分常被省略。"},
+   struct:[{fr:"Oui",role:"回答（是）"},{fr:"sinon",role:"連接詞（否則）"},{fr:"c'est",role:"動詞（是）"},{fr:"une amende",role:"主語補語（罰款）"}],
+   structnote:"c'est + 不定冠詞 + 名詞 是描述/定義的基本句型。注意：c'est un/une（單數）vs ce sont des（複數）。"
+  },
+ ]},
+ {id:"hotel",icon:"🏨",topic:"飯店入住",color:"#1a003d",lines:[
+  {s:"A",fr:"Bonsoir, j'ai une réservation au nom de Chen.",zh:"晚安，我有訂房，姓陳。",
+   vocab:[
+     {w:"j'ai",pos:"動詞",def:"我有",note:"avoir（有）的第一人稱；j'ai = je + ai（母音省略）；超高頻動詞"},
+     {w:"une réservation",pos:"名詞（陰性）",def:"預訂、訂位",note:"réserver（動詞）→ réservation（名詞）；une = 不定冠詞（陰性）"},
+     {w:"au nom de",pos:"介系詞片語",def:"以...的名義、姓名是",note:"au = à + le；nom = name；固定用法，報名字必用"},
+   ],
+   grammar:{pattern:"J'ai une [名詞] au nom de [姓名].",note:"avoir 現在式：j'ai / tu as / il a / nous avons / vous avez / ils ont。表達「擁有」或「存在預訂」都用 avoir。"},
+   struct:[{fr:"j'ai",role:"動詞（我有）"},{fr:"une réservation",role:"受詞（預訂）"},{fr:"au nom de Chen",role:"補充（姓名）"}],
+   structnote:"au nom de 是辦理入住、取票時的固定說法。au 是 à + le 的縮合冠詞，遇陽性名詞必縮寫。"
+  },
+  {s:"B",fr:"Parfait. Votre chambre est au cinquième étage.",zh:"很好。您的房間在五樓。",
+   vocab:[
+     {w:"parfait",pos:"形容詞/感嘆詞",def:"完美的、太好了",note:"非常常用的回應詞；也用 très bien、d'accord、excellent"},
+     {w:"votre",pos:"形容詞",def:"您的（正式）",note:"所有格形容詞：votre（您的/你們的）；非正式：ton/ta（你的）"},
+     {w:"chambre",pos:"名詞（陰性）",def:"房間",note:"la chambre；不同於 la salle（廳）或 la pièce（房間/一般）"},
+     {w:"au cinquième étage",pos:"副詞片語",def:"在五樓",note:"序數：premier（1st）deuxième（2nd）troisième（3rd）quatrième（4th）cinquième（5th）"},
+   ],
+   grammar:{pattern:"[名詞] est au [序數] étage.",note:"樓層用序數 + étage：au deuxième étage（二樓）。注意：法國的「一樓」= rez-de-chaussée（地面層），「二樓」= premier étage（我們說的一樓）！"},
+   struct:[{fr:"Votre chambre",role:"主語（您的房間）"},{fr:"est",role:"動詞 être（是/在）"},{fr:"au cinquième étage",role:"地點（在五樓）"}],
+   structnote:"être 用來表達位置：La chambre est au troisième étage.（房間在三樓）。au = à + le（前置詞縮合）。"
+  },
+  {s:"A",fr:"Est-ce que le petit-déjeuner est inclus ?",zh:"早餐有包含在房價內嗎？",
+   vocab:[
+     {w:"le petit-déjeuner",pos:"名詞（陽性）",def:"早餐",note:"petit = 小；déjeuner = 午餐（字面：小午餐）；le déjeuner = 午餐；le dîner = 晚餐"},
+     {w:"inclus",pos:"形容詞",def:"包含在內的",note:"inclure（包含）的過去分詞作形容詞；inclus（陽性）/ incluse（陰性）"},
+   ],
+   grammar:{pattern:"Est-ce que [名詞] est inclus(e) ?",note:"inclus 需配合名詞的性：le petit-déjeuner（陽性）→ inclus；la TVA（陰性）→ incluse。同樣結構也用：compris / comprise（另一個表示包含的詞）"},
+   struct:[{fr:"Est-ce que",role:"疑問引導詞"},{fr:"le petit-déjeuner",role:"主語（早餐）"},{fr:"est inclus",role:"述語（被包含）"}],
+   structnote:"être + 形容詞（過去分詞）是被動描述的常用結構：est inclus（被包含）、est servi（被供應）、est fermé（被關閉）。"
+  },
+  {s:"B",fr:"Oui, il est servi jusqu'à dix heures.",zh:"有的，供應到十點。",
+   vocab:[
+     {w:"servi",pos:"形容詞（過去分詞）",def:"被供應",note:"servir（服務、供應）的過去分詞；il est servi = it is served"},
+     {w:"jusqu'à",pos:"介系詞",def:"直到、到...為止",note:"jusque + à = jusqu'à；表時間或空間的終點；jusqu'à + 時間"},
+     {w:"dix heures",pos:"名詞片語",def:"十點",note:"heures = hours/o'clock；dix heures = 10:00；注意 heure 是陰性"},
+   ],
+   grammar:{pattern:"Il est servi jusqu'à [時間].",note:"注意主語：這裡 il 指的是 le petit-déjeuner（代名詞替代前面的名詞）。時間表達：de 7 heures à 10 heures（從7點到10點）"},
+   struct:[{fr:"il",role:"主語（替代早餐）"},{fr:"est servi",role:"被動語態"},{fr:"jusqu'à dix heures",role:"時間終點"}],
+   structnote:"être + 過去分詞 = 被動語態。il est servi（被供應）、il est fermé（被關閉）、il est inclus（被包含）。這三個飯店高頻結構要熟記。"
+  },
+  {s:"A",fr:"Pouvez-vous me réveiller à sept heures demain ?",zh:"明天七點可以幫我叫醒嗎？",
+   vocab:[
+     {w:"pouvez-vous",pos:"動詞（倒裝疑問）",def:"您能否...？",note:"pouvoir（能、可以）的倒裝疑問式；比 est-ce que vous pouvez 更正式"},
+     {w:"me",pos:"代名詞",def:"我（受詞）",note:"直接受詞代名詞：me（我）te（你）le/la（他/她）nous（我們）vous（您/你們）les（他們）"},
+     {w:"réveiller",pos:"動詞",def:"叫醒",note:"se réveiller = 自己醒來（反身動詞）；réveiller（他動）= 叫醒別人"},
+     {w:"demain",pos:"副詞",def:"明天",note:"今天：aujourd'hui；昨天：hier；明天：demain；後天：après-demain"},
+   ],
+   grammar:{pattern:"Pouvez-vous + [動詞不定式] ?",note:"倒裝疑問：主語動詞對調，中間加連字號。pouvoir 倒裝：Pouvez-vous...? Peut-il...? 比 est-ce que 更正式，常見於飯店、商務場合。"},
+   struct:[{fr:"Pouvez-vous",role:"倒裝疑問（您能否）"},{fr:"me",role:"受詞代名詞（我）"},{fr:"réveiller",role:"動詞不定式（叫醒）"},{fr:"à sept heures",role:"時間（七點）"},{fr:"demain",role:"時間副詞（明天）"}],
+   structnote:"受詞代名詞 me 必須放在動詞正前方：Pouvez-vous me réveiller（不能說 Pouvez-vous réveiller me）。這是法語詞序的重要規則。"
+  },
+  {s:"B",fr:"Bien sûr. Avez-vous besoin d'autre chose ?",zh:"當然。您還需要其他服務嗎？",
+   vocab:[
+     {w:"bien sûr",pos:"慣用語",def:"當然、沒問題",note:"sûr = sure/certain；bien = well；固定說法，非常口語化"},
+     {w:"avez-vous besoin de",pos:"動詞片語",def:"您需要...嗎？",note:"avoir besoin de = to need；完整結構：[人] + avoir besoin de + [名詞/不定式]"},
+     {w:"autre chose",pos:"名詞片語",def:"其他事情、別的",note:"autre = other；chose = thing；quelque chose（某事）vs autre chose（其他事）"},
+   ],
+   grammar:{pattern:"Avez-vous besoin de + [名詞/不定式] ?",note:"avoir besoin de 是固定搭配，de 後面：名詞（besoin d'aide）或不定式（besoin de partir）。注意母音前 de → d'。"},
+   struct:[{fr:"Avez-vous",role:"倒裝疑問"},{fr:"besoin",role:"名詞（需要）"},{fr:"d'autre chose",role:"de + 名詞片語"}],
+   structnote:"avoir besoin de 是法語最重要的慣用動詞片語之一。J'ai besoin d'aide.（我需要幫助）、Elle a besoin de dormir.（她需要睡眠）。"
+  },
+ ]},
+ {id:"work",icon:"💼",topic:"職場商務",color:"#002a3d",lines:[
+  {s:"A",fr:"Bonjour, j'ai rendez-vous avec Monsieur Moreau.",zh:"您好，我與莫羅先生有約。",
+   vocab:[
+     {w:"rendez-vous",pos:"名詞（陽性）",def:"約會、預約、約定",note:"字面：you all present yourselves（你們報到）；現代意思為任何預約；avoir rendez-vous = 有約"},
+     {w:"avec",pos:"介系詞",def:"與...、和...",note:"avec + 人 = with someone；Avec qui ?（和誰？）"},
+     {w:"Monsieur",pos:"稱謂",def:"先生",note:"縮寫 M.；複數 Messieurs（MM.）；女性 Madame（Mme.）/ Mademoiselle（Mlle.）"},
+   ],
+   grammar:{pattern:"J'ai rendez-vous avec + [稱謂 + 姓名].",note:"avoir rendez-vous（有約）是固定用法。注意 rendez-vous 不加冠詞：j'ai rendez-vous（不是 j'ai un rendez-vous，雖然這樣也對，但口語省略 un）"},
+   struct:[{fr:"j'ai rendez-vous",role:"動詞片語（有約）"},{fr:"avec",role:"介系詞（與）"},{fr:"Monsieur Moreau",role:"人物（稱謂＋姓）"}],
+   structnote:"法語正式稱謂：Monsieur（先生）/ Madame（女士）+ 姓氏。名字較少用於正式場合。稱謂縮寫：M. Moreau / Mme. Dupont。"
+  },
+  {s:"B",fr:"Il est en réunion. Puis-je prendre votre nom ?",zh:"他在開會。請問貴姓大名？",
+   vocab:[
+     {w:"en réunion",pos:"介系詞片語",def:"在開會中",note:"en + 活動名詞，無冠詞：en réunion（開會）、en vacances（度假）、en voyage（旅行）"},
+     {w:"puis-je",pos:"動詞（倒裝）",def:"我可以...嗎？",note:"pouvoir 的第一人稱倒裝疑問：puis-je（較正式）= est-ce que je peux（口語）；注意用 puis 而非 peux"},
+     {w:"prendre",pos:"動詞",def:"取得、記下",note:"字面是「拿」，在此語境指「記下您的名字」；prendre note = 做筆記"},
+   ],
+   grammar:{pattern:"Il/Elle est en + [活動名詞].",note:"en + 無冠詞名詞 表示「正在進行某活動」：en réunion / en cours / en déplacement / en congé。這是辦公室場景必用句型。"},
+   struct:[{fr:"Il est",role:"主語＋動詞"},{fr:"en réunion",role:"狀態（en + 名詞）"},{fr:"Puis-je",role:"第一人稱倒裝"},{fr:"prendre votre nom",role:"動詞片語（記下名字）"}],
+   structnote:"puis-je 是 peux-je 的正式版（peux-je 聽起來不自然）。職場正式請求常用 puis-je / pourriez-vous / serait-il possible de。"
+  },
+  {s:"A",fr:"Je m'appelle Lin Wei, de la société TechTaiwan.",zh:"我叫林威，TechTaiwan公司。",
+   vocab:[
+     {w:"je m'appelle",pos:"反身動詞",def:"我叫做...",note:"s'appeler（反身動詞）= to be called；m' = me（反身代名詞）；je m'appelle / tu t'appelles / il s'appelle"},
+     {w:"la société",pos:"名詞（陰性）",def:"公司、企業",note:"la société = company/society；也可用 l'entreprise（較大企業）或 la firme"},
+     {w:"de",pos:"介系詞",def:"來自、屬於",note:"表示歸屬：je suis de Paris（我來自巴黎）；de la société（公司的代表）"},
+   ],
+   grammar:{pattern:"Je m'appelle [名字], de [公司/機構].",note:"s'appeler 反身動詞變化：je m'appelle / tu t'appelles / il s'appelle / nous nous appelons / vous vous appelez / ils s'appellent（注意雙 l）"},
+   struct:[{fr:"Je m'appelle",role:"反身動詞（我叫）"},{fr:"Lin Wei",role:"名字"},{fr:"de la société TechTaiwan",role:"所屬公司"}],
+   structnote:"de + 冠詞 + 名詞 表示歸屬或來源：de la société（陰性）/ du département（陽性）/ des équipes（複數）。"
+  },
+  {s:"B",fr:"Il sera disponible dans un quart d'heure.",zh:"他大約十五分鐘後有空。",
+   vocab:[
+     {w:"sera",pos:"動詞",def:"將會是",note:"être 的第三人稱單數未來式（futur simple）；将来式：je serai / tu seras / il sera / nous serons"},
+     {w:"disponible",pos:"形容詞",def:"有空的、可用的",note:"dis + ponible（拉丁語：可以調配的）；用於人（有空）或物（可用）"},
+     {w:"dans",pos:"介系詞",def:"在...之後（時間）",note:"dans + 時間段 = in ...（從現在起多久後）：dans une heure（一小時後）、dans deux jours（兩天後）"},
+     {w:"un quart d'heure",pos:"名詞片語",def:"一刻鐘、十五分鐘",note:"quart = quarter（四分之一）；d'heure = of an hour；demi-heure = 半小時"},
+   ],
+   grammar:{pattern:"Il sera [形容詞] dans [時間].",note:"futur simple（未來式）規則動詞：不定式 + 字尾 -ai/-as/-a/-ons/-ez/-ont。être → serai/seras/sera/serons/serez/seront（不規則）"},
+   struct:[{fr:"Il",role:"主語"},{fr:"sera disponible",role:"未來式（將有空）"},{fr:"dans un quart d'heure",role:"時間（十五分鐘後）"}],
+   structnote:"時間介系詞區分：dans（從現在起...後）vs en（花費時間）vs depuis（自從）vs il y a（...前）。dans une heure = in an hour（from now）。"
+  },
+  {s:"A",fr:"Pourriez-vous lui confirmer ma présence ?",zh:"能否告知他我已到了？",
+   vocab:[
+     {w:"pourriez-vous",pos:"動詞（條件式）",def:"您能否...？（有禮貌的請求）",note:"pouvoir 的 vous 條件式倒裝；是最有禮貌的請求方式之一"},
+     {w:"lui",pos:"代名詞",def:"給他/給她（間接受詞）",note:"間接受詞代名詞：lui（他/她）leur（他們）me（我）vous（您）；放在動詞前"},
+     {w:"confirmer",pos:"動詞",def:"確認、通知",note:"和英文 confirm 同源；confirmer + 名詞 / confirmer + que + 句子"},
+     {w:"ma présence",pos:"名詞片語",def:"我的到來、我的在場",note:"ma = mon 的陰性（présence 是陰性）；présence = presence；être présent = 在場"},
+   ],
+   grammar:{pattern:"Pourriez-vous + [動詞不定式] + [間接受詞代名詞] ?",note:"條件式（Conditionnel présent）pouvoir → je pourrais / vous pourriez，用於委婉請求，比 pouvez-vous 更客氣。"},
+   struct:[{fr:"Pourriez-vous",role:"動詞（條件式倒裝）"},{fr:"lui",role:"間接受詞（給他）"},{fr:"confirmer",role:"動詞不定式"},{fr:"ma présence",role:"受詞（我的到來）"}],
+   structnote:"間接受詞代名詞 lui/leur 位置：放在動詞直前（他動詞）。Pourriez-vous lui dire...（告訴他）/ lui envoyer...（發給他）/ lui confirmer...（確認給他）。"
+  },
+  {s:"B",fr:"Bien sûr. Je vous apporte un café en attendant ?",zh:"當然。等候期間為您送上咖啡嗎？",
+   vocab:[
+     {w:"apporte",pos:"動詞",def:"帶來、送上",note:"apporter（帶來某物）的第一人稱現在式；amener = 帶來某人"},
+     {w:"vous",pos:"代名詞",def:"給您（間接受詞）",note:"此處 vous 是間接受詞（給您）：je vous apporte（我帶給您）"},
+     {w:"en attendant",pos:"副詞片語",def:"在等待期間、meanwhile",note:"attendant = 等待（attendre 的現在分詞）；en + 現在分詞 = 一邊...一邊..."},
+   ],
+   grammar:{pattern:"Je vous + [動詞] + [名詞], en attendant ?",note:"en + 現在分詞（gérondif）表示「同時進行」：en attendant（等待時）/ en mangeant（吃飯時）/ en lisant（閱讀時）"},
+   struct:[{fr:"Je",role:"主語"},{fr:"vous apporte",role:"動詞＋間受詞"},{fr:"un café",role:"直接受詞"},{fr:"en attendant",role:"分詞狀語（等候期間）"}],
+   structnote:"je vous apporte（我給您帶來）— 注意詞序：主語 + 間接受詞代名詞 + 動詞 + 直接受詞。法語代名詞永遠貼近動詞。"
+  },
+ ]},
+ {id:"shop",icon:"🛒",topic:"購物殺價",color:"#3d0010",lines:[
+  {s:"A",fr:"Bonjour, je cherche une veste pour femme.",zh:"您好，我在找女性外套。",
+   vocab:[
+     {w:"une veste",pos:"名詞（陰性）",def:"外套、夾克",note:"veste（輕薄外套）vs manteau（大衣）vs blouson（夾克）vs veston（西裝外套）"},
+     {w:"pour femme",pos:"介系詞片語",def:"女款、供女性使用",note:"pour + 性別/年齡 = 款式用途；pour homme（男款）/ pour enfant（童款）/ pour adulte（成人款）"},
+   ],
+   grammar:{pattern:"Je cherche + [冠詞] + [名詞] + [補語].",note:"chercher（找）+ 不定冠詞（un/une）= 找某種類型的東西。如已確定具體是哪件：chercher + 定冠詞（le/la）+ 名詞。"},
+   struct:[{fr:"Je cherche",role:"動詞（在找）"},{fr:"une veste",role:"受詞（不定冠詞）"},{fr:"pour femme",role:"用途限定"}],
+   structnote:"une（不定冠詞）= 某一件（類型不定）；la（定冠詞）= 那件特定的。購物說「我想找一件...」用不定冠詞 un/une，指特定物品才用定冠詞。"
+  },
+  {s:"B",fr:"Quelle taille faites-vous ?",zh:"您穿什麼尺寸？",
+   vocab:[
+     {w:"quelle",pos:"疑問形容詞",def:"什麼（陰性）",note:"quel（陽性）/ quelle（陰性）/ quels（陽性複數）/ quelles（陰性複數）；修飾名詞，需配合名詞的性數"},
+     {w:"taille",pos:"名詞（陰性）",def:"尺寸、身材",note:"la taille = size / waist / height；此處指衣服尺寸：taille 36/38/40/42..."},
+     {w:"faites-vous",pos:"動詞（倒裝）",def:"您是（多少尺寸）",note:"faire（做）在此表示「穿/是（尺碼）」；慣用語：faire du 40 = 穿40號"},
+   ],
+   grammar:{pattern:"Quelle + [陰性名詞] + [倒裝動詞] ?",note:"quel/quelle 是疑問形容詞，必須和後面名詞的性數一致：Quelle couleur（陰性）/ Quel prix（陽性）/ Quels modèles（陽性複數）"},
+   struct:[{fr:"Quelle",role:"疑問形容詞（什麼/幾號）"},{fr:"taille",role:"名詞（尺寸）"},{fr:"faites-vous",role:"動詞（倒裝）"}],
+   structnote:"faire du + 數字 = 穿...號：Je fais du 38.（我穿38號）。這是法國服裝尺寸的固定說法，不能替換其他動詞。"
+  },
+  {s:"A",fr:"Je fais du quarante. Je peux essayer ?",zh:"我穿40號，可以試穿嗎？",
+   vocab:[
+     {w:"je fais du",pos:"動詞片語",def:"我穿...號",note:"faire du + 數字 = 穿某尺寸；du = de + le（縮合冠詞）"},
+     {w:"je peux",pos:"動詞",def:"我可以",note:"pouvoir（能、可以）的第一人稱：je peux / tu peux / il peut"},
+     {w:"essayer",pos:"動詞",def:"試穿、嘗試",note:"essayer + 衣物 = 試穿；essayer de + 不定式 = 試著做某事"},
+   ],
+   grammar:{pattern:"Je peux + [動詞不定式] ?",note:"Je peux...? 是最直接的請求許可方式（口語）。更禮貌：Puis-je...?（正式）/ Est-ce que je peux...?（中性）。注意 peux 不能倒裝，倒裝需用 puis-je。"},
+   struct:[{fr:"Je fais du quarante",role:"尺碼聲明"},{fr:"Je peux",role:"請求許可"},{fr:"essayer",role:"動詞不定式（試穿）"}],
+   structnote:"購物三大動詞：essayer（試穿）/ acheter（購買）/ rendre（退貨）。Je voudrais essayer...（我想試穿...）是更有禮貌的說法。"
+  },
+  {s:"B",fr:"Cette veste est en solde, moins trente pour cent.",zh:"這件正在打折，七折。",
+   vocab:[
+     {w:"cette",pos:"指示形容詞",def:"這個（陰性）",note:"ce（陽性）/ cette（陰性）/ ces（複數）= this/these；指示眼前的物品"},
+     {w:"en solde",pos:"介系詞片語",def:"打折、特價中",note:"solde（名詞）= sale/balance；les soldes = 打折季（法國1月和7月有法定打折季）"},
+     {w:"moins",pos:"副詞",def:"減少、少",note:"moins = less/minus；moins trente pour cent = minus 30%（七折）"},
+     {w:"pour cent",pos:"名詞片語",def:"百分之",note:"pour = per；cent = hundred；30 pour cent = 30%；也可寫成 30%"},
+   ],
+   grammar:{pattern:"[名詞] est en solde, moins [數字] pour cent.",note:"打折描述：en solde（特價）/ en promotion（促銷）/ à prix réduit（降價）。折扣算法：moins 30% = -30%（七折）。"},
+   struct:[{fr:"Cette veste",role:"指示代名詞＋名詞"},{fr:"est en solde",role:"狀態（特價中）"},{fr:"moins trente pour cent",role:"折扣幅度"}],
+   structnote:"指示形容詞 ce/cette/ces 指眼前可見的物品。加上 -ci/-là 強調遠近：ce manteau-ci（這件）/ ce manteau-là（那件）。"
+  },
+  {s:"A",fr:"Elle me plaît. Vous faites un geste sur le prix ?",zh:"我很喜歡。價格上可以再優惠嗎？",
+   vocab:[
+     {w:"elle me plaît",pos:"動詞片語",def:"我喜歡它",note:"plaire（喜歡）的用法和英文相反：主語是「被喜歡的東西」。Cette veste me plaît = 這件外套令我喜歡 = 我喜歡這件外套"},
+     {w:"faire un geste",pos:"慣用語",def:"做個好意、給個優惠",note:"字面：做個手勢；引申：在價格上讓步、給折扣；是法語討價還價的核心說法"},
+     {w:"sur le prix",pos:"介系詞片語",def:"在價格上",note:"sur = on/regarding；sur le prix = regarding the price"},
+   ],
+   grammar:{pattern:"Vous faites un geste sur [名詞] ?",note:"plaire 的語法很特別：[物/人] plaît à [人]。我喜歡 = ça me plaît / il/elle me plaît。注意：不能說 je plais cette veste（錯誤）。"},
+   struct:[{fr:"Elle me plaît",role:"主語是東西，me 是人（反向結構）"},{fr:"Vous faites",role:"動詞（做）"},{fr:"un geste",role:"慣用語（讓步）"},{fr:"sur le prix",role:"範圍（在價格上）"}],
+   structnote:"plaire 語法：La musique me plaît.（我喜歡這音樂）= La musique plaît à moi.（音樂讓我感到喜悅）。類似結構：ça m'intéresse / ça me convient / ça m'arrange。"
+  },
+  {s:"B",fr:"Je peux vous faire moins cinq euros. C'est mon dernier prix.",zh:"可以再少五歐。這是最低價了。",
+   vocab:[
+     {w:"vous faire moins",pos:"動詞片語",def:"給您少（優惠）",note:"faire + 數字 = 開價；faire moins = 少一點；je vous fais 50 euros = 我給您50歐元（報價）"},
+     {w:"mon dernier prix",pos:"名詞片語",def:"我的最低價、最終價",note:"dernier = last/final；mon = 我的（所有格）；這句話意思是「不能再讓了」"},
+   ],
+   grammar:{pattern:"Je peux vous faire [數字/優惠]. C'est mon dernier prix.",note:"faire [數字] 在議價中 = 開出這個價格；je vous fais X euros（我給您X歐元的價格）。議價常用：c'est mon dernier prix / je ne peux pas faire mieux（我無法再更好了）。"},
+   struct:[{fr:"Je peux vous faire",role:"動詞片語（給您優惠）"},{fr:"moins cinq euros",role:"優惠幅度"},{fr:"C'est mon dernier prix",role:"底線宣告"}],
+   structnote:"je vous fais + 價格 是議價的固定表達，直接報出數字。這和 je vous donne（給您）/ je vous propose（提議）意思相近但更商業化。"
+  },
+ ]},
+];
+
+// Metro announcements with vocab + grammar
+const metroAnnouncements = [
+  {cat:"🚉 到站與路線",color:"#003580",items:[
+    {fr:"Prochain arrêt : Châtelet.",zh:"下一站：沙特雷站。",
+     ipa:"pʁɔ-ʃɛ̃ a-ʁɛ ʃɑ-tə-lɛ",bpm:"波-ㄒㄩㄢ 阿-喝ㄝ 夏-特-ㄌㄝ",
+     vocab:[
+       {w:"prochain",pos:"形容詞",ipa:"pʁɔ-ʃɛ̃",bpm:"波-ㄒㄩㄢ",def:"下一個（陽性）",note:"prochain（陽性）/ prochaine（陰性）；arrêt 是陽性 → prochain arrêt；反義：dernier arrêt（末站）"},
+       {w:"arrêt",pos:"名詞（陽性）",ipa:"a-ʁɛ",bpm:"阿-喝ㄝ",def:"站、停靠點",note:"arrêter（停止）的名詞形；un arrêt = one stop；prochains arrêts = 下幾站"},
+     ],
+     grammar:{pattern:"Prochain arrêt : [站名].",note:"廣播省略主語和動詞，只留最關鍵的名詞片語。完整句為：Le prochain arrêt est Châtelet."},
+     struct:[{fr:"Prochain arrêt",role:"主語（下一站）"},{fr:"Châtelet",role:"站名"}],
+     structnote:"廣播體（style d'annonce）大量使用名詞句，省略動詞，語速快且直接。聽到 prochain arrêt 後面就是站名，要立刻反應。"
+    },
+    {fr:"Terminus : Gare de Lyon. Tout le monde descend.",zh:"終點站：里昂車站。請所有乘客下車。",
+     ipa:"tɛʁ-mi-nys ɡaʁ də ljɔ̃ tu lə mɔ̃d de-sɑ̃",bpm:"鐵喝-米-紐斯 ㄍㄚ喝 德 里昂 禿 勒 蒙ㄉ ㄉㄝ-ㄙㄤ",
+     vocab:[
+       {w:"terminus",pos:"名詞（陽性）",ipa:"tɛʁ-mi-nys",bpm:"鐵喝-米-紐斯",def:"終點站",note:"拉丁語借詞；複數同形；聽到此詞即所有人必須下車"},
+       {w:"tout le monde",pos:"名詞片語",ipa:"tu lə mɔ̃d",bpm:"禿 勒 蒙ㄉ",def:"所有人、大家",note:"tout（所有）+ le monde（世界/人們）= everybody；後面動詞用第三人稱單數"},
+       {w:"descend",pos:"動詞",ipa:"de-sɑ̃",bpm:"ㄉㄝ-ㄙㄤ",def:"下車",note:"descendre 第三人稱單數；tout le monde descend = 大家都下車"},
+     ],
+     grammar:{pattern:"Terminus : [站名]. Tout le monde descend.",note:"tout le monde 雖然意思是「所有人」（複數概念），但法語語法中動詞仍用第三人稱單數：tout le monde descend（不是 descendent）。"},
+     struct:[{fr:"Terminus",role:"宣告（終點）"},{fr:"Gare de Lyon",role:"站名"},{fr:"Tout le monde",role:"主語（所有人）"},{fr:"descend",role:"動詞（第三人稱單數）"}],
+     structnote:"Gare de Lyon 是「里昂的車站」— de + 城市名不加冠詞。Gare de Paris / Gare de Bordeaux。注意 tout le monde 後動詞單數。"
+    },
+    {fr:"Cette rame est à destination de Saint-Denis.",zh:"本列車開往聖但尼方向。",
+     ipa:"sɛt ʁam ɛ a dɛs-ti-na-sjɔ̃ də sɛ̃-də-ni",bpm:"ㄙㄝ特 喝ㄚ姆 ㄝ 阿 ㄉㄝ斯-提-納-ㄒㄩㄥ 德 ㄙㄤ-德-尼",
+     vocab:[
+       {w:"rame",pos:"名詞（陰性）",ipa:"ʁam",bpm:"喝ㄚ姆",def:"列車、車組",note:"地鐵/火車用詞；不同於 train（通常指長途）"},
+       {w:"à destination de",pos:"介系詞片語",ipa:"a dɛs-ti-na-sjɔ̃ də",bpm:"阿 ㄉㄝ斯-提-納-ㄒㄩㄥ 德",def:"開往、目的地為",note:"固定片語：à destination de + 地點 = heading to；廣播和票務標準用語"},
+     ],
+     grammar:{pattern:"Cette [交通工具] est à destination de [地點].",note:"à destination de 是正式/廣播用語。口語說 direction：Cette rame va en direction de... 或更口語 Cette rame va à..."},
+     struct:[{fr:"Cette rame",role:"主語（本列車）"},{fr:"est",role:"動詞 être"},{fr:"à destination de Saint-Denis",role:"目的地片語"}],
+     structnote:"指示形容詞 cette（陰性）因為 rame 是陰性。若是 train（陽性）則說 ce train。à destination de 後面不加冠詞（地名直接接）。"
+    },
+    {fr:"Direction Châtelet–Les Halles, changement possible.",zh:"往沙特雷–萊阿勒方向，可轉乘其他路線。",
+     ipa:"di-ʁɛk-sjɔ̃ ʃɑ-tə-lɛ le al ʃɑ̃ʒ-mɑ̃ pɔ-sibl",bpm:"ㄉㄧ-喝ㄝ克-ㄒㄩㄥ 夏特ㄌㄝ ㄌㄝ-阿勒 ㄒㄩㄤ-芒 波-ㄒ希ㄅ勒",
+     vocab:[
+       {w:"direction",pos:"名詞（陰性）",ipa:"di-ʁɛk-sjɔ̃",bpm:"ㄉㄧ-喝ㄝ克-ㄒㄩㄥ",def:"方向、目的方向",note:"地鐵廣播核心詞彙；direction + 終點站名 = 往...方向"},
+       {w:"changement",pos:"名詞（陽性）",ipa:"ʃɑ̃ʒ-mɑ̃",bpm:"ㄒㄩㄤ-芒",def:"換乘、轉乘",note:"changer（換）的名詞；changement possible = transfer is possible"},
+       {w:"possible",pos:"形容詞",ipa:"pɔ-sibl",bpm:"波-ㄒ希ㄅ勒",def:"可能的、有可能",note:"修飾 changement；il est possible de...（有可能...）"},
+     ],
+     grammar:{pattern:"Direction [終點站], changement possible.",note:"廣播體：高度省略，只保留名詞。完整句：La direction de cette rame est Châtelet–Les Halles, où un changement est possible."},
+     struct:[{fr:"Direction Châtelet–Les Halles",role:"方向（名詞句）"},{fr:"changement possible",role:"提示（換乘可行）"}],
+     structnote:"巴黎地鐵廣播風格：名詞塊直接疊加，省略所有連接動詞。聽懂關鍵名詞就能理解訊息。"
+    },
+    {fr:"Prochain arrêt : Opéra. Correspondance avec les lignes trois, sept et huit.",zh:"下一站：歌劇院站，可轉乘三、七、八號線。",
+     ipa:"pʁɔ-ʃɛ̃ a-ʁɛ o-pe-ʁa kɔ-ʁɛs-pɔ̃-dɑ̃s a-vɛk le liɲ",bpm:"波ㄒㄩㄢ 阿喝ㄝ 歐-ㄆㄝ-喝ㄚ 口-喝ㄝ斯-崩-當斯 阿-ㄈㄝ克 勒 麗涅",
+     vocab:[
+       {w:"correspondance",pos:"名詞（陰性）",ipa:"kɔ-ʁɛs-pɔ̃-dɑ̃s",bpm:"口-喝ㄝ斯-崩-當斯",def:"換乘、轉乘連接",note:"對應 connection/transfer；有 correspondance 的站叫 station de correspondance"},
+       {w:"avec",pos:"介系詞",ipa:"a-vɛk",bpm:"阿-ㄈㄝ克",def:"與...、連接到",note:"correspondance avec les lignes = connection with the lines"},
+       {w:"les lignes",pos:"名詞（陰性複數）",ipa:"le liɲ",bpm:"勒 麗涅",def:"路線們",note:"la ligne（一條線）→ les lignes（複數）；路線用數字：ligne trois = 三號線"},
+     ],
+     grammar:{pattern:"Correspondance avec les lignes [數字] et [數字].",note:"列舉三個以上用逗號，最後一個用 et：lignes trois, sept et huit。Et 前不加逗號（和中文不同）。"},
+     struct:[{fr:"Prochain arrêt : Opéra",role:"下一站宣告"},{fr:"Correspondance",role:"換乘提示"},{fr:"avec les lignes trois, sept et huit",role:"可換乘路線"}],
+     structnote:"記住換乘關鍵詞 correspondance（轉乘）和 ligne（路線）。在巴黎地鐵，correspondance 和 changement 都表示換乘，但 correspondance 在廣播中更常見。"
+    },
+  ]},
+  {cat:"🚪 開關門",color:"#1a5276",items:[
+    {fr:"Attention à la fermeture des portes.",zh:"注意關門。",
+     ipa:"a-tɑ̃-sjɔ̃ a la fɛʁ-mə-tyʁ de pɔʁt",bpm:"阿-湯-ㄒㄩㄥ 阿 拉 ㄈㄝ喝-姆-禿喝 德 波喝特",
+     vocab:[
+       {w:"attention",pos:"感嘆詞/名詞",ipa:"a-tɑ̃-sjɔ̃",bpm:"阿-湯-ㄒㄩㄥ",def:"注意！小心！",note:"Attention à + 名詞 = watch out for...；Attention !（單獨）= Careful!"},
+       {w:"la fermeture",pos:"名詞（陰性）",ipa:"fɛʁ-mə-tyʁ",bpm:"ㄈㄝ喝-姆-禿喝",def:"關閉、關門",note:"fermer（關閉）的名詞；fermeture des portes = closing of the doors；ouverture = 開放"},
+       {w:"des portes",pos:"名詞片語",ipa:"de pɔʁt",bpm:"德 波喝特",def:"（各）門",note:"des = de + les（縮合冠詞複數）；une porte（一扇門）→ les portes（所有門）"},
+     ],
+     grammar:{pattern:"Attention à la/au + [名詞].",note:"Attention à + 定冠詞 + 名詞 = Be careful of/about...。à + la（陰性）/ à + le = au（陽性）/ à + les = aux（複數）"},
+     struct:[{fr:"Attention",role:"警示感嘆詞"},{fr:"à la fermeture",role:"à + 名詞（注意...）"},{fr:"des portes",role:"de + les = des（的門）"}],
+     structnote:"這是巴黎地鐵最著名的廣播句，幾乎每站必聽！à + la fermeture：à 遇陰性 la 不縮寫；遇陽性 le 縮寫為 au；遇複數 les 縮寫為 aux。"
+    },
+    {fr:"Les portes vont se fermer. Merci de ne pas les retenir.",zh:"車門即將關閉，請勿阻擋車門。",
+     ipa:"le pɔʁt vɔ̃ sə fɛʁ-me mɛʁ-si də nə pa le ʁə-tə-niʁ",bpm:"勒 波喝特 旺 斯 ㄈㄝ喝-ㄇㄝ 妹喝-希 德 訥 吧 勒 喝-特-尼喝",
+     vocab:[
+       {w:"vont se fermer",pos:"動詞片語",ipa:"vɔ̃ sə fɛʁ-me",bpm:"旺 斯 ㄈㄝ喝-ㄇㄝ",def:"即將關閉",note:"aller + 不定式 = 近未來；vont = aller 第三人稱複數；se fermer = 反身動詞（自動關閉）"},
+       {w:"merci de",pos:"慣用語",ipa:"mɛʁ-si də",bpm:"妹喝-希 德",def:"請（感謝您...）",note:"Merci de + 不定式 = Thank you for / Please（客氣的請求）"},
+       {w:"retenir",pos:"動詞",ipa:"ʁə-tə-niʁ",bpm:"喝-特-尼喝",def:"阻擋、扣住",note:"re + tenir（握住）= 阻擋；ne pas retenir les portes = 不要擋住車門"},
+     ],
+     grammar:{pattern:"Merci de ne pas + [動詞不定式].",note:"否定不定式：ne pas + 動詞不定式（兩個詞放在一起）：ne pas partir / ne pas fumer / ne pas retenir。"},
+     struct:[{fr:"Les portes vont se fermer",role:"近未來（即將關閉）"},{fr:"Merci de",role:"禮貌請求引導"},{fr:"ne pas les retenir",role:"否定不定式（不要阻擋）"}],
+     structnote:"近未來 aller + 不定式：Je vais partir（我要走了）/ Les portes vont se fermer（門要關了）。比未來式更強調「即將發生」的迫切感。"
+    },
+    {fr:"Attention, les portes s'ouvrent côté gauche.",zh:"注意，車門在左側開啟。",
+     ipa:"a-tɑ̃-sjɔ̃ le pɔʁt s-uvʁ ko-te ɡoʃ",bpm:"阿湯ㄒㄩㄥ 勒 波喝特 蘇ㄨ喝 口-帖 ㄍㄛ許",
+     vocab:[
+       {w:"s'ouvrent",pos:"反身動詞",ipa:"s-uvʁ",bpm:"蘇ㄨ喝",def:"（自動）開啟",note:"s'ouvrir 第三人稱複數；s'ouvrir = to open（intransitive）；ouvrir = 打開（他動詞）"},
+       {w:"côté",pos:"名詞（陽性）",ipa:"ko-te",bpm:"口-帖",def:"側邊、側",note:"côté gauche（左側）/ côté droit（右側）/ de l'autre côté（另一側）"},
+       {w:"gauche",pos:"形容詞/名詞",ipa:"ɡoʃ",bpm:"ㄍㄛ許",def:"左、左邊",note:"à gauche（向左）/ la main gauche（左手）；反義：droite（右）"},
+     ],
+     grammar:{pattern:"Les portes s'ouvrent côté [方向].",note:"反身動詞 s'ouvrir：les portes s'ouvrent（門自動開）；他動詞 ouvrir：j'ouvre la porte（我開門）。"},
+     struct:[{fr:"les portes",role:"主語（車門）"},{fr:"s'ouvrent",role:"反身動詞（自動開啟）"},{fr:"côté gauche",role:"方向（左側）"}],
+     structnote:"法語方向詞必記：gauche（左）/ droite（右）/ devant（前方）/ derrière（後方）/ à côté（旁邊）。"
+    },
+  ]},
+  {cat:"⚠️ 安全與注意",color:"#7b241c",items:[
+    {fr:"Attention à l'espace entre le quai et la rame.",zh:"請注意月台與列車之間的空隙。",
+     ipa:"a-tɑ̃-sjɔ̃ a lɛs-pas ɑ̃tʁ lə ke e la ʁam",bpm:"阿-湯-ㄒㄩㄥ 阿 ㄌㄝ斯-帕斯 昂特喝 勒 ㄎㄝ ㄝ 拉 喝ㄚ姆",
+     vocab:[
+       {w:"l'espace",pos:"名詞（陽性）",ipa:"lɛs-pas",bpm:"ㄌㄝ斯-帕斯",def:"空間、空隙",note:"l' 因 espace 以母音開頭；l'espace = the gap/space"},
+       {w:"entre",pos:"介系詞",ipa:"ɑ̃tʁ",bpm:"昂特喝",def:"在...之間",note:"entre A et B = between A and B"},
+       {w:"le quai",pos:"名詞（陽性）",ipa:"lə ke",bpm:"勒 ㄎㄝ",def:"月台",note:"地鐵/火車月台；也指河岸（Quai de la Seine）"},
+     ],
+     grammar:{pattern:"Attention à l'espace entre [A] et [B].",note:"entre A et B 是固定結構，A 和 B 用定冠詞：entre le quai（陽性 le）et la rame（陰性 la）。"},
+     struct:[{fr:"Attention",role:"警示詞"},{fr:"à l'espace",role:"注意的對象"},{fr:"entre le quai et la rame",role:"位置關係（之間）"}],
+     structnote:"l'espace：l' 是 le 在母音前的縮寫（省音）。法語規則：le/la → l' 當後面單字以母音（a e i o u）或啞音 h 開頭。"
+    },
+    {fr:"Veuillez laisser la priorité aux personnes handicapées.",zh:"請禮讓殘障人士優先。",
+     ipa:"vœ-je lɛ-se la pʁi-ɔ-ʁi-te o pɛʁ-sɔn ɑ̃-di-ka-pe",bpm:"微-也 ㄌㄝ-ㄙㄝ 拉 普喝-歐-喝-提-帖 歐 配喝-ㄙㄛ訥 昂-ㄉㄧ-卡-ㄆㄝ",
+     vocab:[
+       {w:"veuillez",pos:"動詞",ipa:"vœ-je",bpm:"微-也",def:"請（正式）",note:"vouloir 的 vous 命令式（最正式）；Veuillez + 不定式 = Please..."},
+       {w:"laisser",pos:"動詞",ipa:"lɛ-se",bpm:"ㄌㄝ-ㄙㄝ",def:"讓、允許",note:"laisser la priorité = yield priority"},
+       {w:"la priorité",pos:"名詞（陰性）",ipa:"pʁi-ɔ-ʁi-te",bpm:"普喝-歐-喝-提-帖",def:"優先權",note:"priorité = priority；donner/laisser la priorité = 讓出優先權"},
+       {w:"aux personnes handicapées",pos:"名詞片語",ipa:"o pɛʁ-sɔn ɑ̃-di-ka-pe",bpm:"歐 配喝-ㄙㄛ訥 昂-ㄉㄧ-卡-ㄆㄝ",def:"給殘障人士",note:"aux = à + les（縮合冠詞複數）"},
+     ],
+     grammar:{pattern:"Veuillez + [動詞不定式] + [受詞].",note:"正式請求等級：Veuillez（最正式）> Pourriez-vous（有禮）> S'il vous plaît（一般）。廣播/公告常用 Veuillez。"},
+     struct:[{fr:"Veuillez",role:"正式命令式（請）"},{fr:"laisser la priorité",role:"動詞片語（禮讓優先）"},{fr:"aux personnes handicapées",role:"à + les → aux（給...人）"}],
+     structnote:"aux = à + les 的縮合（複數）。à + le → au / à + les → aux / à + la 不縮寫 / à + l' 不縮寫。"
+    },
+    {fr:"En cas d'urgence, actionnez le signal d'alarme.",zh:"緊急情況請拉下緊急把手。",
+     ipa:"ɑ̃ ka dyʁ-ʒɑ̃s ak-sjɔ-ne lə si-ɲal da-laʁm",bpm:"昂 卡 ㄉㄩ喝-ㄓㄤ斯 阿克-ㄒㄩ-ㄋㄝ 勒 ㄒ希-涅ㄚ 達-拉喝姆",
+     vocab:[
+       {w:"en cas de",pos:"介系詞片語",ipa:"ɑ̃ ka də",bpm:"昂 卡 德",def:"如果遇到、萬一",note:"en cas de + 名詞 = in case of；en cas d'urgence / d'incendie / de problème"},
+       {w:"actionnez",pos:"動詞",ipa:"ak-sjɔ-ne",bpm:"阿克-ㄒㄩ-ㄋㄝ",def:"啟動、操作",note:"actionner（啟動裝置）的 vous 命令式"},
+       {w:"le signal d'alarme",pos:"名詞片語",ipa:"si-ɲal da-laʁm",bpm:"ㄒ希-涅ㄚ 達-拉喝姆",def:"緊急警報器、緊急手把",note:"signal = signal/device；d'alarme = de + alarme（警報的）"},
+     ],
+     grammar:{pattern:"En cas de + [名詞], + [命令式動詞] + [受詞].",note:"en cas de 後面的名詞不加冠詞：en cas d'urgence。緊急指引的標準句型：條件 + 命令。"},
+     struct:[{fr:"En cas d'urgence",role:"條件狀語（如遇緊急）"},{fr:"actionnez",role:"命令式（啟動）"},{fr:"le signal d'alarme",role:"受詞（警報器）"}],
+     structnote:"d'urgence：de + urgence，因為 urgence 以母音開頭，de → d'（省音）。"
+    },
+    {fr:"Surveillez vos affaires personnelles.",zh:"請看管好您的隨身物品。",
+     ipa:"syʁ-vɛ-je vo za-fɛʁ pɛʁ-sɔ-nɛl",bpm:"希喝-ㄈㄝ-也 佛 ㄗㄚ-ㄈㄝ喝 配喝-ㄙㄛ-ㄋㄝ勒",
+     vocab:[
+       {w:"surveillez",pos:"動詞",ipa:"syʁ-vɛ-je",bpm:"希喝-ㄈㄝ-也",def:"監視、看管",note:"surveiller（監視、留意）的 vous 命令式；surveillance = 監視（名詞）"},
+       {w:"vos",pos:"所有格形容詞",ipa:"vo",bpm:"佛",def:"您的（複數）",note:"votre（您的，單數名詞前）/ vos（您的，複數名詞前）"},
+       {w:"affaires personnelles",pos:"名詞片語",ipa:"a-fɛʁ pɛʁ-sɔ-nɛl",bpm:"ㄚ-ㄈㄝ喝 配喝-ㄙㄛ-ㄋㄝ勒",def:"個人物品、隨身物品",note:"affaires = belongings；personnelles = personal（陰性複數）"},
+     ],
+     grammar:{pattern:"Surveillez vos + [複數名詞].",note:"所有格形容詞配合後面的名詞：votre billet（一張票）/ vos bagages（行李們）/ vos affaires（物品）。"},
+     struct:[{fr:"Surveillez",role:"命令式（看管）"},{fr:"vos affaires",role:"所有格＋複數名詞"},{fr:"personnelles",role:"形容詞（個人的，陰性複數）"}],
+     structnote:"形容詞配合名詞的性和數：affaires（陰性複數）→ personnelles（加 -lles）。"
+    },
+  ]},
+  {cat:"🔧 服務異常",color:"#4a235a",items:[
+    {fr:"En raison d'un incident technique, le trafic est perturbé.",zh:"由於技術故障，列車運行受到影響。",
+     ipa:"ɑ̃ ʁɛ-zɔ̃ dœ̃ ɛ̃-si-dɑ̃ tɛk-nik lə tʁa-fik ɛ pɛʁ-tyʁ-be",bpm:"昂 喝ㄝ-松 ㄉㄩㄣ 昂-ㄒ希-當 帖克-尼克 勒 特喝-費克 ㄝ 配喝-禿喝-ㄅㄝ",
+     vocab:[
+       {w:"en raison de",pos:"介系詞片語",ipa:"ɑ̃ ʁɛ-zɔ̃ də",bpm:"昂 喝ㄝ-松 德",def:"由於、因為",note:"正式說法；口語用 à cause de；en raison de 後接名詞"},
+       {w:"un incident technique",pos:"名詞片語",ipa:"ɛ̃-si-dɑ̃ tɛk-nik",bpm:"昂-ㄒ希-當 帖克-尼克",def:"技術故障",note:"incident = incident/problem；technique = technical"},
+       {w:"le trafic",pos:"名詞（陽性）",ipa:"tʁa-fik",bpm:"特喝-費克",def:"交通運行、路況",note:"le trafic est normal / perturbé / interrompu"},
+       {w:"perturbé",pos:"形容詞",ipa:"pɛʁ-tyʁ-be",bpm:"配喝-禿喝-ㄅㄝ",def:"受到影響的",note:"perturber（干擾）的過去分詞；services are disrupted"},
+     ],
+     grammar:{pattern:"En raison de + [原因], [主語] est + [狀態形容詞].",note:"en raison de（由於）是正式廣播用語。à cause de 較口語。後面接名詞，不接 que 引導的子句。"},
+     struct:[{fr:"En raison d'un incident technique",role:"原因狀語"},{fr:"le trafic",role:"主語"},{fr:"est perturbé",role:"être + 過去分詞（被動狀態）"}],
+     structnote:"地鐵服務狀態：normal（正常）/ perturbé（受影響）/ interrompu（中斷）/ rétabli（恢復）。聽到 perturbé 就知道班次有延誤。"
+    },
+    {fr:"Cette station est fermée. Veuillez emprunter un itinéraire bis.",zh:"本站暫時關閉，請改道繞行。",
+     ipa:"sɛt sta-sjɔ̃ ɛ fɛʁ-me vœ-je ɑ̃-pʁœ̃-te œ̃ i-ti-ne-ʁɛʁ bis",bpm:"ㄙㄝ特 斯他-ㄒㄩㄥ ㄝ ㄈㄝ喝-ㄇㄝ 微也 昂-普ㄌㄩ特-帖 昂 伊-提-ㄋㄝ-喝ㄝ喝 比斯",
+     vocab:[
+       {w:"fermée",pos:"形容詞",ipa:"fɛʁ-me",bpm:"ㄈㄝ喝-ㄇㄝ",def:"關閉的（陰性）",note:"fermer 的過去分詞；station 是陰性 → fermée（加 -e）"},
+       {w:"emprunter",pos:"動詞",ipa:"ɑ̃-pʁœ̃-te",bpm:"昂-普ㄌㄩ特-帖",def:"借用、走（路線）",note:"字面是「借」；emprunter un itinéraire = 走某條路線"},
+       {w:"un itinéraire bis",pos:"名詞片語",ipa:"i-ti-ne-ʁɛʁ bis",bpm:"伊-提-ㄋㄝ-喝ㄝ喝 比斯",def:"替代路線",note:"itinéraire = route；bis = second/alternate（拉丁語借詞）"},
+     ],
+     grammar:{pattern:"[名詞] est fermé(e). Veuillez emprunter [替代方案].",note:"fermé/fermée 配合主語性別：la station（陰性）→ fermée；le bureau（陽性）→ fermé。"},
+     struct:[{fr:"Cette station est fermée",role:"陰性主語＋狀態"},{fr:"Veuillez emprunter",role:"正式命令（請走）"},{fr:"un itinéraire bis",role:"受詞（替代路線）"}],
+     structnote:"bis 在法語中是「第二個、替代的」：itinéraire bis（備用路線）。在音樂場合 bis = encore（再來一曲）。"
+    },
+    {fr:"Le trafic est interrompu entre les stations Bastille et Nation.",zh:"巴士底站至民族站之間暫停服務。",
+     ipa:"lə tʁa-fik ɛ ɛ̃-tɛ-ʁɔ̃-py ɑ̃tʁ le sta-sjɔ̃ bas-tij e na-sjɔ̃",bpm:"勒 特喝費克 ㄝ 昂-帖-喝-ㄆ喲 昂特喝 勒 斯他-ㄒㄩㄥ 巴斯-帝以 ㄝ 拿-ㄒㄩㄥ",
+     vocab:[
+       {w:"interrompu",pos:"形容詞",ipa:"ɛ̃-tɛ-ʁɔ̃-py",bpm:"昂-帖-喝-ㄆ喲",def:"中斷的",note:"interrompre（中斷）的過去分詞；比 perturbé 更嚴重，意味完全停止"},
+       {w:"entre les stations",pos:"介系詞片語",ipa:"ɑ̃tʁ le sta-sjɔ̃",bpm:"昂特喝 勒 斯他-ㄒㄩㄥ",def:"在各站之間",note:"entre + les stations + A + et + B"},
+     ],
+     grammar:{pattern:"Le trafic est interrompu entre les stations [站名] et [站名].",note:"interrompu 配合 trafic（陽性）不加 -e。如果說 la ligne est interrompue（陰性）則需加 -e。"},
+     struct:[{fr:"Le trafic est interrompu",role:"狀態（服務中斷）"},{fr:"entre les stations",role:"位置（在...站之間）"},{fr:"Bastille et Nation",role:"兩個站名"}],
+     structnote:"服務狀態嚴重程度：normal < ralenti < perturbé < interrompu。聽到 interrompu 要立刻找替代交通方式。"
+    },
+    {fr:"Nous vous prions de nous excuser pour la gêne occasionnée.",zh:"對於造成的不便，我們深表歉意。",
+     vocab:[
+       {w:"prions",pos:"動詞",def:"請求、懇請",note:"prier（祈禱/請求）的 nous 現在式；nous vous prions de = we kindly ask you to；非常正式"},
+       {w:"excuser",pos:"動詞",def:"原諒、體諒",note:"excuser（原諒）；nous excuser = 對我們的諒解；比 pardon 更書面化"},
+       {w:"la gêne occasionnée",pos:"名詞片語",def:"所造成的不便",note:"gêne = inconvenience/discomfort；occasionnée（陰性，配合 gêne）= caused/occasioned"},
+     ],
+     grammar:{pattern:"Nous vous prions de nous excuser pour [原因].",note:"prier + de + 不定式 = to ask/beg someone to do...。這是法語最正式的道歉/請求結構，常見於官方公告、廣播、書面通知。"},
+     struct:[{fr:"Nous vous prions",role:"主語＋動詞（我們懇請您）"},{fr:"de nous excuser",role:"de + 不定式（原諒我們）"},{fr:"pour la gêne occasionnée",role:"原因（對於造成的不便）"}],
+     structnote:"occasionnée 的 -ée 是因為 gêne 是陰性名詞，過去分詞作形容詞需配合陰性加 -e。這整句是法國交通公告道歉的「固定句型」，幾乎一字不差。"
+    },
+    {fr:"Des navettes de remplacement sont mises en place.",zh:"已安排接駁巴士替代服務。",
+     vocab:[
+       {w:"des navettes",pos:"名詞（陰性複數）",def:"接駁車、梭子（巴士）",note:"navette = shuttle；navette de remplacement = replacement bus；navette spatiale = 太空梭"},
+       {w:"de remplacement",pos:"介系詞片語",def:"替代用的、代替的",note:"remplacement = replacement；de remplacement = replacement（形容詞用途）"},
+       {w:"mises en place",pos:"動詞片語",def:"已安排妥當",note:"mettre en place（安排、部署）的過去分詞；mises 因 navettes（陰性複數）→ mises（加 -es）"},
+     ],
+     grammar:{pattern:"Des [名詞] sont mises/mis en place.",note:"mettre en place（被動）：les mesures sont mises en place（措施已就位）；主語陰性複數 → mises；陽性複數 → mis。被動語態：être + 過去分詞。"},
+     struct:[{fr:"Des navettes de remplacement",role:"主語（接駁車）"},{fr:"sont mises en place",role:"被動語態（已安排）"}],
+     structnote:"被動語態：être + 過去分詞，過去分詞配合主語性數變化。navettes（陰性複數）→ mises（加 -es）。被動語態常見於廣播、公告、新聞。"
+    },
+  ]},
+  {cat:"🎫 驗票與罰款",color:"#1c4f2a",items:[
+    {fr:"Pensez à valider votre titre de transport.",zh:"請記得驗票。",
+     vocab:[
+       {w:"pensez à",pos:"動詞片語",def:"記得（要做某事）",note:"penser à + 不定式 = remember to / think about doing；這是提醒的常用說法"},
+       {w:"valider",pos:"動詞",def:"驗票、刷卡",note:"在法國搭乘所有大眾運輸必須 valider（感應）票卡；否則算逃票"},
+       {w:"titre de transport",pos:"名詞片語",def:"交通票券",note:"titre = title/document；titre de transport = transit pass/ticket；包括 ticket t+、Navigo 等"},
+     ],
+     grammar:{pattern:"Pensez à + [動詞不定式].",note:"penser à + 不定式 = to remember to do。例：Pensez à fermer la porte.（記得關門）/ Pensez à rappeler.（記得回電）。比命令式更溫和的提醒。"},
+     struct:[{fr:"Pensez",role:"命令式（請想到）"},{fr:"à valider",role:"à + 不定式（去驗票）"},{fr:"votre titre de transport",role:"受詞（您的票券）"}],
+     structnote:"penser à 和 penser de 意思不同：penser à = think about/remember（惦記）；penser de = have an opinion about（認為）。Qu'est-ce que tu penses de ce film ?（你覺得這部電影怎樣？）"
+    },
+    {fr:"Le contrôle des titres de transport est en cours.",zh:"目前正在進行驗票。",
+     vocab:[
+       {w:"le contrôle",pos:"名詞（陽性）",def:"查票、檢查",note:"contrôler（檢查）的名詞；le contrôle = inspection；agent de contrôle = 查票員"},
+       {w:"des titres",pos:"縮合冠詞＋名詞",def:"（各種）票券的",note:"des = de + les；titres de transport（複數）= transit tickets/passes"},
+       {w:"est en cours",pos:"動詞片語",def:"正在進行中",note:"en cours = in progress / ongoing；est en cours = is currently underway；非常常用"},
+     ],
+     grammar:{pattern:"[名詞] est en cours.",note:"en cours 表示「正在進行」：les travaux sont en cours（工程進行中）/ la vérification est en cours（驗證中）/ la réunion est en cours（會議中）。"},
+     struct:[{fr:"Le contrôle des titres de transport",role:"主語（查票）"},{fr:"est en cours",role:"狀態（進行中）"}],
+     structnote:"des titres：des = de + les（複數縮合冠詞）。contrôle des titres = inspection of the tickets（tickets 的所有格）。法語名詞的所有格用 de 連接，不用 's。"
+    },
+    {fr:"Voyager sans titre de transport valable est passible d'une amende.",zh:"無效票乘車可能被罰款。",
+     vocab:[
+       {w:"voyager",pos:"動詞（作主語）",def:"乘車、旅行（作名詞用）",note:"動詞不定式作句子主語：Voyager sans ticket = Traveling without a ticket（就像英文動名詞）"},
+       {w:"sans",pos:"介系詞",def:"沒有、無",note:"sans + 名詞（無冠詞）= without；sans ticket（不帶票）/ sans argent（沒錢）/ sans hésiter（毫不猶豫）"},
+       {w:"valable",pos:"形容詞",def:"有效的",note:"valable = valid；titre de transport valable = valid ticket；反義：invalide / périmé（過期）"},
+       {w:"est passible de",pos:"動詞片語",def:"可能被（處分）",note:"être passible de = to be liable to；法律/規定用語；est passible d'une amende = is subject to a fine"},
+       {w:"une amende",pos:"名詞（陰性）",def:"罰款",note:"recevoir/payer une amende = 收到/繳納罰款；巴黎逃票罰款 €50 起"},
+     ],
+     grammar:{pattern:"[動詞不定式] est passible de + [名詞].",note:"不定式作主語：法語可以用動詞不定式當句子主語（類似英文動名詞）。Fumer est interdit.（吸菸被禁止）/ Partir est difficile.（離開很難）"},
+     struct:[{fr:"Voyager sans titre de transport valable",role:"不定式主語片語"},{fr:"est passible",role:"動詞狀態"},{fr:"d'une amende",role:"後果（罰款）"}],
+     structnote:"sans + 名詞 不用冠詞（通常）：sans billet / sans argent / sans problème。但說特定物品時可加冠詞：sans le billet que tu as acheté（沒有你買的那張票）。"
+    },
+  ]},
+];
+
+const alphabet = [
+  {l:"A",speak:"Ah",name:"a",ipa:"a",hint:"阿",note:"嘴大開，發短促的「阿」",ex:{w:"ami",zh:"朋友"}},
+  {l:"B",speak:"Bé",name:"bé",ipa:"be",hint:"杯",note:"雙唇爆破音，不送氣",ex:{w:"bonjour",zh:"你好"}},
+  {l:"C",speak:"Sé",name:"sé",ipa:"se",hint:"ㄙㄟ",note:"e/i前發s，其餘發k",ex:{w:"café",zh:"咖啡"}},
+  {l:"D",speak:"Dé",name:"dé",ipa:"de",hint:"ㄉㄟ",note:"舌尖抵上齒背",ex:{w:"demain",zh:"明天"}},
+  {l:"E",speak:"E",name:"e",ipa:"ə",hint:"ㄜ",note:"不重讀時幾乎不發音",ex:{w:"eau",zh:"水"}},
+  {l:"F",speak:"Effe",name:"effe",ipa:"ɛf",hint:"艾夫",note:"上齒輕咬下唇送氣",ex:{w:"fille",zh:"女兒/女孩"}},
+  {l:"G",speak:"Gé",name:"gé",ipa:"ʒe",hint:"瑞",note:"e/i前發「ㄓ」，否則發「ㄍ」",ex:{w:"gare",zh:"車站"}},
+  {l:"H",speak:"Ash",name:"ache",ipa:"aʃ",hint:"阿什",note:"通常完全不發音",ex:{w:"hôtel",zh:"飯店"}},
+  {l:"I",speak:"Ee",name:"i",ipa:"i",hint:"一",note:"嘴角拉開，比中文「一」更緊短",ex:{w:"ici",zh:"這裡"}},
+  {l:"J",speak:"Ji",name:"ji",ipa:"ʒi",hint:"基",note:"類似英文 measure 中的 s",ex:{w:"jour",zh:"白天/日子"}},
+  {l:"K",speak:"Ka",name:"ka",ipa:"ka",hint:"卡",note:"主要用於外來語",ex:{w:"kilo",zh:"公斤"}},
+  {l:"L",speak:"Elle",name:"elle",ipa:"ɛl",hint:"艾勒",note:"舌尖抵上齒背，響亮清晰",ex:{w:"lune",zh:"月亮"}},
+  {l:"M",speak:"Emme",name:"emme",ipa:"ɛm",hint:"艾姆",note:"雙唇閉合鼻音",ex:{w:"merci",zh:"謝謝"}},
+  {l:"N",speak:"Aine",name:"enne",ipa:"ɛn",hint:"艾呢",note:"舌尖抵上齒背鼻音",ex:{w:"nuit",zh:"夜晚"}},
+  {l:"O",speak:"Oh",name:"o",ipa:"o",hint:"歐",note:"開口o與閉口o音色略有差異",ex:{w:"orange",zh:"橘子"}},
+  {l:"P",speak:"Pé",name:"pé",ipa:"pe",hint:"配",note:"雙唇爆破，不送氣",ex:{w:"pain",zh:"麵包"}},
+  {l:"Q",speak:"Ku",name:"ku",ipa:"ky",hint:"去",note:"幾乎只與u組合成 qu，發k音",ex:{w:"quartier",zh:"街區"}},
+  {l:"R",speak:"Air",name:"erre",ipa:"ʁ",hint:"喝",note:"小舌振動發出的喉音，不是舌尖音",ex:{w:"rue",zh:"街道"}},
+  {l:"S",speak:"Esse",name:"esse",ipa:"ɛs",hint:"艾絲",note:"兩母音間的s發z音（如maison）",ex:{w:"soleil",zh:"太陽"}},
+  {l:"T",speak:"Té",name:"té",ipa:"te",hint:"ㄉㄟ",note:"舌尖爆破，不送氣",ex:{w:"train",zh:"火車"}},
+  {l:"U",speak:"U",name:"u",ipa:"y",hint:"淤",note:"嘴圓如ㄨ，舌位如ㄧ，法語獨有音",ex:{w:"unique",zh:"獨特的"}},
+  {l:"V",speak:"Vé",name:"vé",ipa:"ve",hint:"微",note:"上齒咬下唇，聲帶需振動",ex:{w:"ville",zh:"城市"}},
+  {l:"W",speak:"Double vé",name:"double vé",ipa:"dubləve",hint:"度不勒微",note:"外來語用，發v或w音",ex:{w:"wagon",zh:"車廂"}},
+  {l:"X",speak:"Iks",name:"ixe",ipa:"iks",hint:"一克斯",note:"字中多發 ks 音（如taxi）",ex:{w:"taxi",zh:"計程車"}},
+  {l:"Y",speak:"Igrec",name:"i grec",ipa:"iɡʁɛk",hint:"一葛嘿克",note:"發音與 i 相同，意為「希臘字母i」",ex:{w:"yeux",zh:"眼睛"}},
+  {l:"Z",speak:"Zed",name:"zède",ipa:"zɛd",hint:"賊德",note:"類似英文z，聲帶振動",ex:{w:"zéro",zh:"零"}},
+];
+
+const frNums = [
+  "","un","deux","trois","quatre","cinq","six","sept","huit","neuf","dix",
+  "onze","douze","treize","quatorze","quinze","seize","dix-sept","dix-huit","dix-neuf","vingt",
+  "vingt et un","vingt-deux","vingt-trois","vingt-quatre","vingt-cinq","vingt-six","vingt-sept","vingt-huit","vingt-neuf","trente",
+  "trente et un","trente-deux","trente-trois","trente-quatre","trente-cinq","trente-six","trente-sept","trente-huit","trente-neuf","quarante",
+  "quarante et un","quarante-deux","quarante-trois","quarante-quatre","quarante-cinq","quarante-six","quarante-sept","quarante-huit","quarante-neuf","cinquante",
+  "cinquante et un","cinquante-deux","cinquante-trois","cinquante-quatre","cinquante-cinq","cinquante-six","cinquante-sept","cinquante-huit","cinquante-neuf","soixante",
+  "soixante et un","soixante-deux","soixante-trois","soixante-quatre","soixante-cinq","soixante-six","soixante-sept","soixante-huit","soixante-neuf","soixante-dix",
+  "soixante et onze","soixante-douze","soixante-treize","soixante-quatorze","soixante-quinze","soixante-seize","soixante-dix-sept","soixante-dix-huit","soixante-dix-neuf","quatre-vingts",
+  "quatre-vingt-un","quatre-vingt-deux","quatre-vingt-trois","quatre-vingt-quatre","quatre-vingt-cinq","quatre-vingt-six","quatre-vingt-sept","quatre-vingt-huit","quatre-vingt-neuf","quatre-vingt-dix",
+  "quatre-vingt-onze","quatre-vingt-douze","quatre-vingt-treize","quatre-vingt-quatorze","quatre-vingt-quinze","quatre-vingt-seize","quatre-vingt-dix-sept","quatre-vingt-dix-huit","quatre-vingt-dix-neuf","cent"
+];
+
+// ======================================================
+// VOICE ENGINE
+// ======================================================
+let allVoices = [], selectedVoice = null;
+
+function loadVoices(){
+  allVoices = window.speechSynthesis.getVoices();
+  populateVoiceSelect();
+}
+window.speechSynthesis.onvoiceschanged = loadVoices;
+
+function genderGuess(v){
+  const n = v.name.toLowerCase();
+  const fem = ['amelie','alice','audrey','virginie','juliette','claire','marie','isabelle','céline','celine','fiona','sara','nora'];
+  const mal = ['thomas','nicolas','pierre','paul','felix'];
+  if(fem.some(k=>n.includes(k))) return '👩';
+  if(mal.some(k=>n.includes(k))) return '👨';
+  return '🔊';
+}
+
+function populateVoiceSelect(){
+  const sel = document.getElementById('voiceSelect');
+  if(!sel) return;
+  const fr = allVoices.filter(v=>v.lang.startsWith('fr'));
+  if(!fr.length){sel.innerHTML='<option value="-1">⚠️ 無法語語音</option>';return;}
+  sel.innerHTML = fr.map((v,i)=>`<option value="${i}">${genderGuess(v)} ${v.name} (${v.lang})</option>`).join('');
+  const pref = fr.findIndex(v=>v.lang==='fr-FR');
+  sel.selectedIndex = pref>=0 ? pref : 0;
+  selectedVoice = fr[sel.selectedIndex];
+}
+
+function setVoiceFromSelect(sel){
+  const fr = allVoices.filter(v=>v.lang.startsWith('fr'));
+  selectedVoice = fr[parseInt(sel.value)] || null;
+}
+
+let currentEl = null;
+let currentAudio = null; // track playing Audio object
+
+// ── Wikimedia Commons 真人音頻快取 ──
+const wikiAudioCache = {}; // word → url | null
+
+// 透過 Wikimedia API 查詢音檔 URL（試多個命名格式）
+async function fetchWikiAudio(word) {
+  const key = word.toLowerCase().trim();
+  if (key in wikiAudioCache) return wikiAudioCache[key];
+
+  const clean = key.replace(/[?!.,;:''`]/g,'').replace(/\s+/g,'_');
+  const cleanSpace = key.replace(/[?!.,;:''`]/g,'').replace(/\s+/g,' ').trim();
+
+  // 依常見 Wikimedia 命名慣例排列，命中率最高的放前面
+  const candidates = [
+    `Fr-${clean}.ogg`,
+    `Fr-${cleanSpace}.ogg`,
+    `LL-Q150_(fra)-WikiLucas00-${clean}.wav`,
+    `LL-Q150_(fra)-Guilhelma-${clean}.wav`,
+    `LL-Q150_(fra)-Ash Crow-${clean}.wav`,
+    `LL-Q150_(fra)-Lepticed7-${clean}.wav`,
+    `LL-Q150_(fra)-X-Javier-${clean}.wav`,
+    `Fr-fr-${clean}.ogg`,
+  ];
+
+  for (const filename of candidates) {
+    const encoded = encodeURIComponent(filename);
+    const api = `https://commons.wikimedia.org/w/api.php?action=query&titles=File:${encoded}&prop=imageinfo&iiprop=url&format=json&origin=*`;
+    try {
+      const res = await fetch(api, {signal: AbortSignal.timeout(4000)});
+      if (!res.ok) continue;
+      const data = await res.json();
+      const pages = data?.query?.pages || {};
+      for (const [pid, page] of Object.entries(pages)) {
+        if (pid !== '-1' && page.imageinfo?.[0]?.url) {
+          wikiAudioCache[key] = page.imageinfo[0].url;
+          return wikiAudioCache[key];
+        }
+      }
+    } catch(e) { /* timeout or network error, try next */ }
+  }
+
+  wikiAudioCache[key] = null;
+  return null;
+}
+
+function stopCurrent() {
+  if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+  window.speechSynthesis.cancel();
+  if (currentEl) { currentEl.classList.remove('playing'); currentEl = null; }
+  document.getElementById('speakingBar').classList.remove('visible');
+}
+
+// 播放真人音頻（找不到 fallback TTS）
+async function speakWord(word, el, ttsText) {
+  stopCurrent();
+
+  const bar = document.getElementById('speakingBar');
+  const barText = document.getElementById('speakingText');
+
+  currentEl = el;
+  if (el) el.classList.add('playing');
+  bar.classList.add('visible');
+  barText.textContent = `🔍 搜尋 ${word} 真人音頻...`;
+
+  const audioUrl = await fetchWikiAudio(word);
+
+  if (audioUrl) {
+    barText.textContent = `🎙 真人錄音 · ${word}`;
+    const audio = new Audio();
+    audio.crossOrigin = 'anonymous'; // 讓本地開啟時 CORS 正確
+    audio.src = audioUrl;
+    currentAudio = audio;
+
+    audio.onended = () => {
+      currentAudio = null;
+      if (el) el.classList.remove('playing');
+      bar.classList.remove('visible');
+      currentEl = null;
+    };
+    audio.onerror = () => {
+      // 音頻載入失敗 → fallback TTS
+      currentAudio = null;
+      wikiAudioCache[word.toLowerCase().trim()] = null; // 清除失敗快取
+      barText.textContent = `🔊 TTS fallback · ${ttsText || word}`;
+      speak(ttsText || word, el);
+    };
+
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        currentAudio = null;
+        speak(ttsText || word, el);
+      });
+    }
+  } else {
+    // 沒找到 → TTS
+    barText.textContent = `🔊 TTS · ${ttsText || word}`;
+    speak(ttsText || word, el);
+  }
+}
+
+// 原本的 TTS speak（句子/廣播/找不到音檔時用）
+function speak(text, el){
+  // 停掉任何正在播的 wiki 音頻
+  if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+  window.speechSynthesis.cancel();
+  if (currentEl && currentEl !== el) currentEl.classList.remove('playing');
+  const bar = document.getElementById('speakingBar');
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang='fr-FR'; utter.rate=0.82; utter.pitch=1.0;
+  if(selectedVoice) utter.voice=selectedVoice;
+  else{
+    if(!allVoices.length) allVoices=window.speechSynthesis.getVoices();
+    const auto=allVoices.find(v=>v.lang==='fr-FR')||allVoices.find(v=>v.lang.startsWith('fr'));
+    if(auto) utter.voice=auto;
+  }
+  utter.onstart=()=>{
+    currentEl=el; if(el) el.classList.add('playing');
+    bar.classList.add('visible');
+    const preview = text.length > 28 ? text.substring(0,28)+'…' : text;
+    document.getElementById('speakingText').textContent=`🔊 TTS · ${preview}`;
+  };
+  utter.onend=utter.onerror=()=>{
+    if(el) el.classList.remove('playing');
+    bar.classList.remove('visible'); currentEl=null;
+  };
+  window.speechSynthesis.speak(utter);
+}
+
+// ======================================================
+// DETAIL PANEL BUILDER (shared by dialogues + metro)
+// ======================================================
+function buildDetailPanel(line, id){
+  const vocabHtml = line.vocab && line.vocab.length ? `
+    <div class="detail-vocab-title">📚 單字解析</div>
+    <div class="vocab-chips">
+      ${line.vocab.map(v=>{
+        const vSafe = v.w.replace(/'/g,"\\'");
+        const firstToken = v.w.split(' ')[0].replace(/[?!.,;:'']/g,'').replace(/'/g,"\\'");
+        return `
+        <div class="vocab-chip" style="cursor:pointer;" onclick="speakWord('${firstToken}',this,'${vSafe}')">
+          <div style="font-size:0.58rem;color:#157a4a;font-weight:700;margin-bottom:2px;">🎙 點擊聽發音</div>
+          <div class="vocab-word">${v.w}</div>
+          <div class="vocab-pos">${v.pos}</div>
+          ${v.ipa?`<div class="vocab-ipa">/${v.ipa}/</div>`:''}
+          ${v.bpm?`<div class="vocab-bpm">${v.bpm}</div>`:''}
+          <div class="vocab-def">${v.def}</div>
+          ${v.note?`<div class="vocab-note">💡 ${v.note}</div>`:''}
+        </div>`;
+      }).join('')}
+    </div>` : '';
+
+  const grammarHtml = line.grammar ? `
+    <div class="detail-grammar">
+      <div class="detail-grammar-title">✏️ 文法重點</div>
+      <div class="detail-grammar-body">
+        <b>句型：</b>${line.grammar.pattern}<br>
+        ${line.grammar.note}
+      </div>
+    </div>` : '';
+
+  const structHtml = (line.struct && line.struct.length) ? `
+    <div class="detail-struct">
+      <div class="detail-struct-title">🔍 句子結構</div>
+      <div class="struct-parts">
+        ${line.struct.map(p=>`<div class="struct-part"><div class="struct-fr">${p.fr}</div><div class="struct-role">${p.role}</div></div>`).join('')}
+      </div>
+      ${line.structnote?`<div class="struct-note">📌 ${line.structnote}</div>`:''}
+    </div>` : '';
+
+  return `<div class="sent-detail" id="det_${id}">${vocabHtml}${grammarHtml}${structHtml}</div>`;
+}
+
+function toggleDetail(id){
+  const det = document.getElementById('det_'+id);
+  const btn = document.getElementById('btn_'+id);
+  if(!det||!btn) return;
+  const open = det.classList.toggle('open');
+  btn.classList.toggle('open', open);
+  btn.textContent = open ? '✕' : '+';
+}
+
+// ======================================================
+// RENDER FUNCTIONS
+// ======================================================
+function renderGreetings(){
+  document.getElementById('greetGrid').innerHTML = greetings.map((g,i)=>{
+    const id=`gg_${i}`;
+    // For single words use speakWord; for phrases use speak (TTS)
+    const isPhrase = g.fr.includes(' ');
+    const firstWord = g.fr.split(' ')[0].replace(/[?!.,;:'']/g,'');
+    const clickFn = isPhrase
+      ? `speak('${g.fr.replace(/'/g,"\\'")}',document.getElementById('${id}'))`
+      : `speakWord('${firstWord}',document.getElementById('${id}'),'${g.fr.replace(/'/g,"\\'")}')`;
+    const badge = isPhrase
+      ? `<span class="audio-badge tts">🔊 TTS</span>`
+      : `<span class="audio-badge wiki">🎙 真人</span>`;
+    return `<div class="greet-card" id="${id}" onclick="${clickFn}">
+      <div class="greet-play">▶</div>
+      ${badge}
+      <div class="greet-fr">${g.fr}</div>
+      <div class="greet-zh">${g.zh}</div>
+      <div class="greet-ipa">/${g.ipa}/</div>
+      <div class="greet-bpm">${g.bpm}</div>
+    </div>`;
+  }).join('');
+}
+
+function buildSentRows(lines, prefix){
+  return lines.map((line, li)=>{
+    const id=`${prefix}_${li}`;
+    const sf=line.fr.replace(/'/g,"\\'");
+    const tagClass = line.s==='A' ? 'tag-a' : line.s==='B' ? 'tag-b' : 'tag-ann';
+    const hasDetail = (line.vocab&&line.vocab.length) || line.grammar || (line.struct&&line.struct.length);
+    return `<div class="sent-row">
+      <div class="sent-main" id="${id}" onclick="speak('${sf}',document.getElementById('${id}'))">
+        <span class="speaker-tag ${tagClass}">${line.s}</span>
+        <div class="sent-body">
+          <div class="sent-fr">${line.fr}</div>
+          <div class="sent-zh">${line.zh}</div>
+          ${line.ipa?`<div class="sent-ipa">/${line.ipa}/</div>`:''}
+          ${line.bpm?`<div class="sent-bpm">${line.bpm}</div>`:''}
+        </div>
+        <div class="sent-controls" onclick="event.stopPropagation()">
+          <div class="btn-play" onclick="speak('${sf}',document.getElementById('${id}'))">▶</div>
+          ${hasDetail?`<div class="btn-expand" id="btn_${id}" onclick="toggleDetail('${id}')">+</div>`:''}
+        </div>
+      </div>
+      ${hasDetail ? buildDetailPanel(line, id) : ''}
+    </div>`;
+  }).join('');
+}
+
+let activeDlgId = dialogues[0].id;
+function renderSubTabs(){
+  document.getElementById('subTabs').innerHTML = dialogues.map(d=>
+    `<button class="sub-tab-btn${d.id===activeDlgId?' active':''}" onclick="switchDialogue('${d.id}',this)">${d.icon} ${d.topic}</button>`
+  ).join('');
+}
+function switchDialogue(id, btn){
+  activeDlgId=id;
+  document.querySelectorAll('.sub-tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDialogueContent();
+  window.speechSynthesis.cancel();
+  document.getElementById('speakingBar').classList.remove('visible');
+}
+function renderDialogueContent(){
+  const dlg = dialogues.find(d=>d.id===activeDlgId);
+  document.getElementById('dialogueContent').innerHTML =
+    `<div class="dialogue-block">
+      <div class="dialogue-topic" style="background:${dlg.color}">${dlg.icon} ${dlg.topic}</div>
+      ${buildSentRows(dlg.lines, 'dl_'+dlg.id)}
+    </div>`;
+}
+
+function renderMetro(){
+  document.getElementById('metroContainer').innerHTML = metroAnnouncements.map((cat,ci)=>
+    `<div class="dialogue-block" style="margin-bottom:18px;">
+      <div class="dialogue-topic" style="background:${cat.color}">${cat.cat}</div>
+      ${buildSentRows(cat.items.map(item=>({...item, s:'廣播'})), 'ma_'+ci)}
+    </div>`
+  ).join('');
+}
+
+function renderAlphabet(){
+  document.getElementById('alphaGrid').innerHTML = alphabet.map((a,i)=>{
+    const id=`ac_${i}`;
+    const ss=a.speak.replace(/'/g,"\\'");
+    const exId=`ac_ex_${i}`;
+    const exWord = a.ex.w;
+    const exSafe = exWord.replace(/'/g,"\\'");
+    return `<div class="alpha-card" id="${id}" onclick="speak('${ss}',document.getElementById('${id}'))">
+      <div class="alpha-letter">${a.l}</div>
+      <div class="alpha-name" style="font-size:0.78rem;font-weight:700;color:#0a0a1a;margin-bottom:2px;">${a.name}</div>
+      <div style="font-size:0.82rem;font-weight:800;color:#c0392b;margin:2px 0;">${a.hint}</div>
+      <div style="font-size:0.6rem;color:#888;font-style:italic;margin-bottom:6px;">/${a.ipa}/</div>
+      <div style="font-size:0.58rem;color:#0d47a1;margin-bottom:4px;">🔊 TTS 字母名稱</div>
+      <button class="alpha-ex-btn" id="${exId}"
+        onclick="event.stopPropagation();speakWord('${exSafe}',document.getElementById('${exId}'),'${exSafe}')"
+        style="flex-direction:column;gap:1px;padding:5px 8px;height:auto;position:relative;">
+        <span style="font-size:0.62rem;color:#157a4a;font-weight:700;">🎙 真人範例</span>
+        <span style="font-size:0.7rem;font-weight:700;">▶ ${a.ex.w}</span>
+        <span style="font-size:0.62rem;color:#555;font-weight:400;">${a.ex.zh}</span>
+      </button>
+    </div>`;
+  }).join('');
+}
+
+function renderNumbers(range){
+  const nums = range==='1-20'?Array.from({length:20},(_,i)=>i+1)
+    :range==='21-60'?Array.from({length:40},(_,i)=>i+21)
+    :range==='61-100'?Array.from({length:40},(_,i)=>i+61)
+    :Array.from({length:100},(_,i)=>i+1);
+  document.getElementById('numGrid').innerHTML = nums.map(n=>{
+    const id=`nc_${n}`;
+    const word = frNums[n];
+    return `<div class="num-card" id="${id}" onclick="speakWord('${word}',document.getElementById('${id}'),'${word}')">
+      <div class="num-digit">${n}</div>
+      <div class="num-french">${word}</div>
+    </div>`;
+  }).join('');
+}
+function filterNums(range,btn){
+  document.querySelectorAll('.num-filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); renderNumbers(range);
+}
+
+function showMain(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active'); btn.classList.add('active');
+  window.speechSynthesis.cancel();
+  document.getElementById('speakingBar').classList.remove('visible');
+}
+
+// ===== MONTHS DATA =====
+const months = [
+  {n:1, fr:"janvier",   zh:"一月", ipa:"ʒɑ̃-vje",    bpm:"ㄓㄤ-逼ㄝ"},
+  {n:2, fr:"février",   zh:"二月", ipa:"fe-vʁje",    bpm:"ㄈㄝ-喝逼ㄝ"},
+  {n:3, fr:"mars",      zh:"三月", ipa:"maʁs",       bpm:"媽喝斯"},
+  {n:4, fr:"avril",     zh:"四月", ipa:"a-vʁil",     bpm:"阿-喝逼勒"},
+  {n:5, fr:"mai",       zh:"五月", ipa:"mɛ",         bpm:"ㄇㄝ"},
+  {n:6, fr:"juin",      zh:"六月", ipa:"ʒɥɛ̃",        bpm:"ㄓㄩ昂"},
+  {n:7, fr:"juillet",   zh:"七月", ipa:"ʒɥi-jɛ",     bpm:"ㄓㄩ依-ㄧㄝ"},
+  {n:8, fr:"août",      zh:"八月", ipa:"ut",          bpm:"屋特"},
+  {n:9, fr:"septembre", zh:"九月", ipa:"sɛp-tɑ̃bʁ",  bpm:"ㄙㄝ普-湯ㄅ喝"},
+  {n:10,fr:"octobre",   zh:"十月", ipa:"ɔk-tɔbʁ",   bpm:"歐克-托ㄅ喝"},
+  {n:11,fr:"novembre",  zh:"十一月",ipa:"nɔ-vɑ̃bʁ",  bpm:"諾-旺ㄅ喝"},
+  {n:12,fr:"décembre",  zh:"十二月",ipa:"de-sɑ̃bʁ",  bpm:"ㄉㄝ-ㄙㄤㄅ喝"},
+];
+
+function renderMonths(){
+  document.getElementById('monthsGrid').innerHTML = months.map(m=>{
+    const id=`mo_${m.n}`;
+    return `<div class="month-card" id="${id}" onclick="speakWord('${m.fr}',document.getElementById('${id}'),'${m.fr}')">
+      <div class="month-play">▶</div>
+      <span class="audio-badge wiki" style="position:absolute;top:10px;right:36px;">🎙</span>
+      <div class="month-num">第 ${m.n} 月</div>
+      <div class="month-fr">${m.fr}</div>
+      <div class="month-zh">${m.zh}</div>
+      <div class="month-ipa">/${m.ipa}/</div>
+      <div class="month-bpm">${m.bpm}</div>
+    </div>`;
+  }).join('');
+}
+
+window.addEventListener('load',()=>{
+  loadVoices();
+  if(!allVoices.length){allVoices=window.speechSynthesis.getVoices();populateVoiceSelect();}
+  renderGreetings();
+  renderSubTabs();
+  renderDialogueContent();
+  renderMetro();
+  renderAlphabet();
+  renderNumbers('all');
+  renderMonths();
+});
+</script>
+</body>
+</html>
