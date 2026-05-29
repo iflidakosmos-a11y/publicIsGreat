@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>好命人小廚房 — 家騏備餐知識庫</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&family=Noto+Sans+TC:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #faf8f4;
+    --surface: #ffffff;
+    --border: #e8e2d9;
+    --text: #2a2520;
+    --muted: #7a7168;
+    --accent: #5c4a32;
+    --accent-light: #f0ebe2;
+    --green-bg: #eef5ec;
+    --green-text: #2d5a27;
+    --amber-bg: #fdf3e3;
+    --amber-text: #7a4e0a;
+    --highlight: #fff3a3;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  header {
+    background: var(--accent);
+    color: #fff;
+    padding: 1.5rem 2rem 1.25rem;
+  }
+  header h1 {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    margin-bottom: 10px;
+  }
+
+  /* 全站搜尋 */
+  .global-search-wrap { position: relative; }
+  .global-search {
+    width: 100%;
+    padding: 9px 14px 9px 36px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Noto Sans TC', sans-serif;
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    outline: none;
+    transition: background 0.2s;
+  }
+  .global-search::placeholder { color: rgba(255,255,255,0.6); }
+  .global-search:focus { background: rgba(255,255,255,0.25); }
+  .search-icon-header {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 15px;
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  /* 全站搜尋結果 */
+  #global-results {
+    display: none;
+    padding: 1.5rem 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  #global-results.active { display: block; }
+  .result-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
+  .result-item:hover { background: var(--accent-light); }
+  .result-section { font-size: 11px; color: var(--muted); margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .result-title { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+  .result-snippet { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .result-snippet mark { background: var(--highlight); color: var(--text); border-radius: 2px; padding: 0 1px; }
+  .no-results { font-size: 14px; color: var(--muted); padding: 1rem 0; }
+
+  nav {
+    display: flex;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  nav button {
+    padding: 14px 20px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    font-family: 'Noto Sans TC', sans-serif;
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  nav button:hover { color: var(--text); }
+  nav button.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
+
+  .section { display: none; padding: 2rem; max-width: 900px; margin: 0 auto; }
+  .section.active { display: block; }
+
+  .section-title {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .section-desc { font-size: 13px; color: var(--muted); margin-bottom: 1rem; }
+
+  /* 區塊內搜尋 */
+  .section-search {
+    width: 100%;
+    padding: 9px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Noto Sans TC', sans-serif;
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+    margin-bottom: 1.25rem;
+  }
+  .section-search:focus { border-color: var(--accent); }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .card.hidden { display: none; }
+
+  .card-header {
+    padding: 14px 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+  }
+  .card-header:hover { background: var(--accent-light); }
+  .card-title { font-size: 15px; font-weight: 500; }
+  .toggle-icon { color: var(--muted); font-size: 20px; line-height: 1; transition: transform 0.2s; flex-shrink: 0; }
+  .card.open .toggle-icon { transform: rotate(45deg); }
+  .card-body { display: none; padding: 16px 18px 18px; border-top: 1px solid var(--border); }
+  .card.open .card-body { display: block; }
+
+  /* 原話 */
+  .original {
+    background: var(--accent-light);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 6px 6px 0;
+    padding: 10px 14px;
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.8;
+    margin-bottom: 10px;
+    white-space: pre-wrap;
+  }
+
+  .label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+
+  .tip {
+    background: var(--green-bg);
+    border-left: 3px solid #4a9640;
+    border-radius: 0 6px 6px 0;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: var(--green-text);
+    margin-top: 10px;
+    line-height: 1.6;
+  }
+
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; }
+
+  .ing-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .ing-card.hidden { display: none; }
+  .ing-name {
+    font-size: 15px;
+    font-weight: 500;
+    padding: 14px 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+    margin: 0;
+    border: none;
+  }
+  .ing-name:hover { background: var(--accent-light); }
+  .ing-body { display: none; padding: 14px 18px 16px; border-top: 1px solid var(--border); }
+  .ing-card.open .ing-body { display: block; }
+  .ing-card.open .ing-toggle { transform: rotate(45deg); }
+  .ing-toggle { color: var(--muted); font-size: 20px; line-height: 1; transition: transform 0.2s; flex-shrink: 0; }
+
+  .sauce-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+  .sauce-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+  .sauce-label { font-size: 11px; font-weight: 500; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 8px; }
+  .sauce-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+  .sauce-chip { background: var(--accent-light); color: var(--accent); border-radius: 5px; padding: 3px 9px; font-size: 13px; }
+
+  .ratio-display { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 8px 0 12px; }
+  .ratio-pill { background: var(--accent); color: #fff; border-radius: 20px; padding: 5px 14px; font-size: 14px; font-weight: 500; }
+  .ratio-colon { color: var(--muted); font-size: 18px; }
+
+  .sub-title { font-size: 13px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin: 1.5rem 0 8px; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+
+  /* 保存速查 */
+  .storage-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .storage-name {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    padding: 14px 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+  }
+  .storage-name:hover { background: var(--accent-light); }
+  .storage-body { display: none; padding: 14px 18px 16px; border-top: 1px solid var(--border); }
+  .storage-card.open .storage-body { display: block; }
+  .storage-card.open .storage-toggle { transform: rotate(45deg); }
+  .storage-toggle { color: var(--muted); font-size: 20px; line-height: 1; transition: transform 0.2s; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>好命人小廚房 · 家騏備餐知識庫</h1>
+  <div class="global-search-wrap">
+    <span class="search-icon-header">🔍</span>
+    <input class="global-search" type="text" placeholder="全站搜尋…" oninput="globalSearch(this.value)" id="globalInput">
+  </div>
+</header>
+
+<!-- 全站搜尋結果 -->
+<div id="global-results"></div>
+
+<nav id="mainNav">
+  <button class="active" onclick="show('recipes', this)">🍳 食譜</button>
+  <button onclick="show('ingredients', this)">🥦 食材索引</button>
+  <button onclick="show('sauces', this)">🫙 醬料調味</button>
+  <button onclick="show('storage', this)">❄️ 保存速查</button>
+  <button onclick="show('knowledge', this)">💡 料理觀念</button>
+</nav>
+
+<!-- ===== 食譜 ===== -->
+<div id="recipes" class="section active">
+  <div class="section-title">食譜</div>
+  <div class="section-desc">點開每張卡片查看家騏說的完整做法</div>
+  <input class="section-search" type="text" placeholder="搜尋食譜，例如：蝦、豆腐…" oninput="filterCards('recipe-list', this.value)">
+
+  <div id="recipe-list">
+
+    <div class="card" data-keywords="春韭 玉子燒 韭菜 蝦皮 蛋 味醂">
+      <div class="card-header" onclick="toggle(this.parentElement)"><div class="card-title">春韭玉子燒</div><div class="toggle-icon">+</div></div>
+      <div class="card-body">
+        <div class="original">這週在市場買到今年的春韭，很嫩！
+韭菜切碎，蝦皮乾炒出香氣，放入打好的蛋液，
+調味-糖/鹽/味醂，
+下鍋煎出「春韭玉子燒」</div>
+      </div>
+    </div>
+
+    <div class="card" data-keywords="豆腐 烘蛋 豆腐烘蛋 板豆腐 蛋 青蔥 薑">
+      <div class="card-header" onclick="toggle(this.parentElement)"><div class="card-title">豆腐烘蛋</div><div class="toggle-icon">+</div></div>
+      <div class="card-body">
+        <div class="label">做法</div>
+        <div class="original">1.簡單版做法--
+板豆腐壓成泥，拌入蛋液青蔥薑碎+調味料:鹽糖白胡椒粉或香料粉，入油鍋煎成型，食用前加一點芝麻油或芝麻粉
+
+2.蔬菜版做法--
+大致與1相同，需留意的點：加入的蔬菜或菇類都要切小丁容易煮熟，食材味道不要太強烈免得彼此不融合
+
+我前幾天做的豆腐煎餅（圖），加了高麗菜金針菇紅蘿蔔，因為食材多而手邊的蛋不夠，就加了一些麵粉太白粉幫助它定型</div>
+        <div class="label" style="margin-top:12px">預製保存（回覆亭吟）</div>
+        <div class="original">從你貼的照片來看，在拌食材時就水分太多，需要把板豆腐的水分壓乾一點，比較好成形。
+
+1️⃣因包含各種食材(彼此產生化學變化易變質），預先拌好的豆腐蛋泥冷藏兩天內是最適宜的。
+2️⃣如果想冷藏三天以上，食材要分開存放:豆腐和蛋拌勻、料切好，要下鍋前合併及調味。
+3️⃣全部煎起來的做法也是選項，但以冷藏三天內食用完為最佳。</div>
+      </div>
+    </div>
+
+    <div class="card" data-keywords="滷牛腱 牛腱 滷 牛肉 常備菜">
+      <div class="card-header" onclick="toggle(this.parentElement)"><div class="card-title">滷牛腱</div><div class="toggle-icon">+</div></div>
+      <div class="card-body">
+        <div class="original">整顆的滷牛腱也是方便營養的常備菜之一
+
+作法：
+1️⃣滷汁：滷包都是自己買中藥材來包，滷汁裡加薑片鹽米酒少許醬油冰糖。材料-川芎、桂枝、八角、花椒、甘草、月桂葉。當然市售滷包也行。
+
+2️⃣牛腱前置處理：我喜歡牛腱肉裡筋紋多的QQ感，都是買澳洲小花腱。牛腱要先川燙掉血水，川燙水裡加薑片蔥段米酒，冷水入鍋，小火把血水煮出來後洗淨牛腱割除表面筋膜後入滷鍋
+
+3️⃣滷製：滷牛腱最主要的過程是浸泡，先大火煮滾3分鐘轉小火煮10分鐘加蓋熄火浸泡放涼，我一般會反覆煮開➡放涼➡煮開➡放涼的過程3～4次
+
+4️⃣泡在滷汁裡放涼後取出分裝冷凍，想吃時拿一顆出來冷藏退冰，隔天切片加上青蔥香油醬汁作為配菜</div>
+        <div class="label" style="margin-top:12px">補充</div>
+        <div class="original">1. 怎麼知道是否滷透了？
+拿一根筷子插牛腱看看是否可穿透
+2. 滷牛腱以冷食為主，不建議加熱後切片。如果不喜冷感，可放至退到室溫再食用</div>
+      </div>
+    </div>
+
+    <div class="card" data-keywords="羅宋湯 蕃茄 牛肉 湯 常備湯">
+      <div class="card-header" onclick="toggle(this.parentElement)"><div class="card-title">羅宋湯</div><div class="toggle-icon">+</div></div>
+      <div class="card-body">
+        <div class="original">羅宋湯適合重複加熱，使用的食材都是耐燉煮的，湯頭略帶酸味，可以因地制宜選用手邊現有的食材～
+
+原則上的食材內容如下：
+1.肉燉湯＋
+2.炒過的洋蔥紅蘿蔔新鮮蕃茄蕃茄泥+
+3.根莖類/芹菜/大蒜+
+4.高麗菜之類耐燉煮的蔬菜菇類可
+5.調味-鹽/胡椒/酸奶油(可用其他酸味的食材取代譬如希臘優格檸檬）</div>
+      </div>
+    </div>
+
+    <div class="card" data-keywords="雞湯 雞腿 雞肉 煎 湯">
+      <div class="card-header" onclick="toggle(this.parentElement)"><div class="card-title">雞湯（先煎版）</div><div class="toggle-icon">+</div></div>
+      <div class="card-body">
+        <div class="original">生雞腿先抹鹽，醃一下讓牠出水，
+下鍋前擦乾水分，乾鍋煎香帶皮的那面，起鍋備用。
+用鍋裡煎出來的雞油爆香蔥薑，下雞腿肉加米酒炒一下，加水大火煮開撈浮沫幾回，轉小火燜煮至熟透，起鍋前調味。
+
+P.S.
+有時候我受不了雞肉的雞味，就會用鹽醃、先煎過的方式轉化它，同時增加雞湯的香氣。</div>
+      </div>
+    </div>
+
+    <div class="card" data-keywords="雞骨架 高湯 底湯 雞">
+      <div class="card-header" onclick="toggle(this.parentElement)"><div class="card-title">雞骨架高湯</div><div class="toggle-icon">+</div></div>
+      <div class="card-body">
+        <div class="original">雞骨架熬高湯，先川燙，取出洗去血雜等後，重起一鍋水熬湯
+
+雞骨架川燙時不用放薑蔥
+
+重起一鍋水熬湯時加（※原訊息未發完即中斷）</div>
+        <div class="label" style="margin-top:10px">課程說明</div>
+        <div class="original">還有分享兩種煮雞湯的方法，其中一種可做為常備雞高湯(分裝冷凍)，運用範圍廣泛唷</div>
+      </div>
+    </div>
+
+    <div class="card" data-keywords="泡菜 雞絲 雞胸 韓式 涼拌">
+      <div class="card-header" onclick="toggle(this.parentElement)"><div class="card-title">韓式泡菜拌雞絲</div><div class="toggle-icon">+</div></div>
+      <div class="card-body">
+        <div class="original">韓式泡菜拌雞絲，我使用的是雞胸肉，抹鹽靜置半小時入電鍋半杯水蒸熟放涼，取當餐要吃的量剝絲，加洋蔥絲紅蘿蔔絲(燙熟放涼）韓式泡菜拌勻，食用前滴一點香油
+(剩餘的雞絲可冰冷藏3-4天，作為其他餐涼拌菜的蛋白質）</div>
+      </div>
+    </div>
+
+    <div class="card" data-keywords="蒜香蝦 蝦 蒜 辣椒">
+      <div class="card-header" onclick="toggle(this.parentElement)"><div class="card-title">蒜香蝦</div><div class="toggle-icon">+</div></div>
+      <div class="card-body">
+        <div class="label">5/17課後補充說明</div>
+        <div class="original">🦐「蒜香蝦蝦」
+請加註：可以吃點辣的話，爆炒蝦頭時可以加辣椒，調味時也可以加黑胡椒</div>
+        <div class="label" style="margin-top:10px">回覆淑婷問題</div>
+        <div class="original">對，蝦頭要炒乾炒香，才下蝦仁。
+很棒！有去實做就會發現細節關鍵的地方
+
+你有加酒嗎？這也會有增香的作用</div>
+      </div>
+    </div>
+
+    <div class="card" data-keywords="蝦湯 蝦殼 底湯 熬湯">
+      <div class="card-header" onclick="toggle(this.parentElement)"><div class="card-title">熬蝦湯</div><div class="toggle-icon">+</div></div>
+      <div class="card-body">
+        <div class="label">做法</div>
+        <div class="original">熬蝦湯--
+我把薑碎片下油鍋爆香，再下蝦殼，下一點米酒，炒香後加熱水蓋過蝦殼，熬至水剩一半熄火。放涼後冰起來。</div>
+        <div class="label" style="margin-top:10px">5/17課後補充</div>
+        <div class="original">🍲「熬蝦湯」
+請加註：熬至水剩一半，熄火放涼，瀝掉蝦殼後冰起來備用。</div>
+        <div class="label" style="margin-top:10px">重點提醒</div>
+        <div class="original">感覺蝦殼沒有炒乾炒香，熬出來的蝦湯沒有蝦紅素(蝦湯會浮一層紅色的油）</div>
+      </div>
+    </div>
+
+    <div class="card" data-keywords="義式水煮魚 魚 蛤仔 洋蔥 白酒">
+      <div class="card-header" onclick="toggle(this.parentElement)"><div class="card-title">義式水煮魚</div><div class="toggle-icon">+</div></div>
+      <div class="card-body">
+        <div class="label">流程（回覆純瑜）</div>
+        <div class="original">把流程寫一下：
+魚先醃過，擦乾後下油鍋，放側邊就可以下洋蔥絲炒，魚單面煎香後翻面，繼續炒洋蔥。火力保持中火，洋蔥炒好，魚也差不多煎好，下白酒嗆鍋(白葡萄酒或米酒），再加蛤仔湯/蕃茄／胡椒粉，加蓋悶煮一會兒，等魚吸收後下新鮮蛤仔/洋香菜加蓋等蛤仔開口，調味，起鍋。</div>
+        <div class="label" style="margin-top:10px">回覆洋蔥做法問題</div>
+        <div class="original">油炒，炒出焦糖化。
+
+原本是一鍋到底，當日因鍋子比較小，而分開炒
+
+是！（確認是同一鍋煎魚旁邊炒洋蔥）</div>
+      </div>
+    </div>
+
+    <div class="card" data-keywords="紅燒草魚 草魚 紅燒 魚 去腥">
+      <div class="card-header" onclick="toggle(this.parentElement)"><div class="card-title">紅燒草魚</div><div class="toggle-icon">+</div></div>
+      <div class="card-body">
+        <div class="original">你買的草魚應該是養殖的，難免土腥味，我若買到這種魚，會先做排掉魚肉裡味道的前置作業：在鹽水裡洗淨魚，擦乾，整條魚抹上鹽，放冰箱冷藏靜置讓牠出水，隔天拿出來擦乾水分再下鍋。
+草魚適合做紅燒的，可以蓋過牠的腥味。
+做法：
+草魚煎香撈起，爆香蔥薑蒜豆瓣醬，加一點水，放入草魚，煮滾後放醬油酒糖胡椒粉做調味，燜煮至收汁，起鍋前淋一點香油。</div>
+      </div>
+    </div>
+
+    <div class="card" data-keywords="豆豉 炒肉 豆乾 豆豉炒肉片豆乾">
+      <div class="card-header" onclick="toggle(this.parentElement)"><div class="card-title">豆豉炒肉片豆乾</div><div class="toggle-icon">+</div></div>
+      <div class="card-body">
+        <div class="original">豆豉炒肉片豆乾--
+不確定你炒製的流程有哪些，通常不好吃多半問題出在豆干。
+通常買回來我會要先鹽水川燙，去掉豆腥味以便下鍋時更容易吸附調味。
+按照你的食材我重做的話流程--
+1️⃣川燙豆干取出備用2️⃣炒醃肉(炒乾炒香)3️⃣下豆豉(或蔥薑蒜自由配)炒香4️⃣下一點水煮開放入豆干拌勻燜煮至水收乾5️⃣起鍋前最後調味(鹽or香油）</div>
+        <div class="label" style="margin-top:10px">回覆醃肉做法問題</div>
+        <div class="original">醃肉的部分蠔油+醬油+胡椒就夠了，豆鼓要下鍋去炒（豆鼓醃製時所產生的特有氣味經過翻炒會轉化成另一種美味）</div>
+      </div>
+    </div>
+
+    <div class="card" data-keywords="甜筍 清炒 竹筍 筍">
+      <div class="card-header" onclick="toggle(this.parentElement)"><div class="card-title">甜筍清炒</div><div class="toggle-icon">+</div></div>
+      <div class="card-body">
+        <div class="original">既然是甜筍，清炒最好吃，用豆瓣醬反而可惜了他自帶鮮美味。
+甜筍切絲，
+下油鍋爆香蒜頭或薑片（油要多一點）
+放入筍，炒香，調味。
+
+p.s.也可以打幾顆蛋下去一起拌炒，增加蛋白質</div>
+      </div>
+    </div>
+
+    <div class="card" data-keywords="味噌 旗魚 醃肉 味噌醃">
+      <div class="card-header" onclick="toggle(this.parentElement)"><div class="card-title">味噌醃肉（旗魚）</div><div class="toggle-icon">+</div></div>
+      <div class="card-body">
+        <div class="label">比例（回覆香潔）</div>
+        <div class="original">醃食材的味噌醬比例，味增：糖：酒 = 5：2：2
+下次你試試看</div>
+        <div class="label" style="margin-top:10px">做法（回覆羽佩）</div>
+        <div class="original">味噌旗魚醃漬時間約兩日，醃好洗掉味噌擦乾冷凍(冷藏)，可當餐料理也可預製冷藏，食用時滴一點檸檬</div>
+      </div>
+    </div>
+
+    <div class="card" data-keywords="南瓜炊飯 炊飯 南瓜 香菇 米">
+      <div class="card-header" onclick="toggle(this.parentElement)"><div class="card-title">南瓜炊飯</div><div class="toggle-icon">+</div></div>
+      <div class="card-body">
+        <div class="original">南瓜炊飯：米、南瓜、乾香菇、加少許鹽或醬油及橄欖油</div>
+        <div class="tip">香菇要先泡水，泡的水可以加進電子鍋裡一起蒸會更有風味（亭吟分享，家騏未另作說明）</div>
+      </div>
+    </div>
+
+    <div class="card" data-keywords="磨菇 筊白筍 玉米筍 炒">
+      <div class="card-header" onclick="toggle(this.parentElement)"><div class="card-title">磨菇炒筊白筍（玉米筍）</div><div class="toggle-icon">+</div></div>
+      <div class="card-body">
+        <div class="original">磨菇炒筊白筍（玉米筍）：
+磨菇炒乾，加油及一點蔥（蒜）紅蘿蔔配色，再加入筊白筍玉米筍炒至香氣出來，最後鹽調味。</div>
+      </div>
+    </div>
+
+    <div class="card" data-keywords="醋飯 壽司飯 醋 飯">
+      <div class="card-header" onclick="toggle(this.parentElement)"><div class="card-title">醋飯（壽司飯）</div><div class="toggle-icon">+</div></div>
+      <div class="card-body">
+        <div class="original">醋飯是先煮好飯，趁飯還熱的時候一邊吹風一邊拌入醋汁。煮壽司飯的水要少一點，因為加入醋汁後飯會再更軟。</div>
+      </div>
+    </div>
+
+  </div><!-- end recipe-list -->
+</div>
+
+<!-- ===== 食材索引 ===== -->
+<div id="ingredients" class="section">
+  <div class="section-title">食材索引</div>
+  <div class="section-desc">只收錄家騏說過的食材知識</div>
+  <input class="section-search" type="text" placeholder="搜尋食材，例如：蝦、豆腐、菇…" oninput="filterIngredients(this.value)">
+
+  <div id="ing-grid">
+
+    <div class="ing-card" data-name="鮭魚">
+      <div class="ing-name" onclick="toggleIng(this.parentElement)">🐟 鮭魚<span class="ing-toggle">+</span></div>
+      <div class="ing-body">
+        <div class="original" style="font-size:13px">鮭魚算是容易熟的食材，不必先煮熟再冷凍，
+可以用你喜歡的口味先醃漬後冷凍，食用前一天拿到冷藏退冰。
+煎或烤之前擦乾再入鍋，當餐現料理比較可以吃到魚的風味，而且所費時間也不多。</div>
+        <div class="original" style="font-size:13px;margin-top:6px">煮熟的鮭魚的復熱方式，冷藏解凍後我會用電鍋保溫的方式來復熱(電鍋先放30cc水按下跳起後放入在保溫狀態約半小時），而不會再蒸過，這樣可以保持魚肉的口感及風味接近你煮好時的狀態。</div>
+      </div>
+    </div>
+
+    <div class="ing-card" data-name="蝦">
+      <div class="ing-name" onclick="toggleIng(this.parentElement)">🦐 蝦<span class="ing-toggle">+</span></div>
+      <div class="ing-body">
+        <div class="original" style="font-size:13px">蝦子螃蟹之類容易腐敗的海鮮，確實先煮熟再冷凍可以保鮮，但食用方式是先放冷藏解凍，再放室溫退冰，並不適合再加熱，再次加熱常會讓風味流失肉質口感改變。
+另外，蝦子中間黑黑的一條，有沒有可能是蝦子的腸泥腺，建議在生的時候先去掉再料理會比較好。</div>
+        <div class="original" style="font-size:13px;margin-top:6px">如果是整隻帶殻未處理的蝦、小卷之類的海鮮，分裝時會加入蓋過食材的水量再冷凍，用意是比較不會有凍傷。</div>
+      </div>
+    </div>
+
+    <div class="ing-card" data-name="菇類 香菇">
+      <div class="ing-name" onclick="toggleIng(this.parentElement)">🍄 菇類<span class="ing-toggle">+</span></div>
+      <div class="ing-body">
+        <div class="original" style="font-size:13px">現在菇類都是太空包栽培，一般都算乾淨不用清洗。
+當次料理用不完的部分，可以先切成之後料理需要的尺寸，譬如切塊切片切絲，裝袋冷凍。
+下次料理前直接拿出來下鍋就行</div>
+      </div>
+    </div>
+
+    <div class="ing-card" data-name="蓮藕 山藥">
+      <div class="ing-name" onclick="toggleIng(this.parentElement)">🌱 蓮藕 / 山藥<span class="ing-toggle">+</span></div>
+      <div class="ing-body">
+        <div class="original" style="font-size:13px">蓮藕、山藥，也很適合作為常備菜，買回來洗淨切片或切塊裝袋冷凍，料理前拿出來退冰即可下鍋，他們雖然是植物但不會因為冷凍改變口感。
+這兩個食材都是可涼拌、可炒菜、可燉煮，很好運用。</div>
+        <div class="original" style="font-size:13px;margin-top:6px">山藥需要去皮。
+
+蓮藕則依照你買到的狀態，如果是已經刷乾淨的，不用削皮。但如果是帶泥的，刷洗乾淨還是看起來髒髒的，就削皮。</div>
+      </div>
+    </div>
+
+    <div class="ing-card" data-name="板豆腐 豆腐">
+      <div class="ing-name" onclick="toggleIng(this.parentElement)">🟡 板豆腐<span class="ing-toggle">+</span></div>
+      <div class="ing-body">
+        <div class="original" style="font-size:13px">板豆腐壓成泥，拌入蛋液青蔥薑碎+調味料...入油鍋煎成型（板豆腐的水分壓乾一點，比較好成形）
+
+豆腐的豆味可以透過「過水」或「先煎過」來去除</div>
+      </div>
+    </div>
+
+    <div class="ing-card" data-name="雞腿肉 雞肉">
+      <div class="ing-name" onclick="toggleIng(this.parentElement)">🍗 雞腿肉<span class="ing-toggle">+</span></div>
+      <div class="ing-body">
+        <div class="original" style="font-size:13px">雞腿先川燙再冷凍：這個做法比較適合燉煮用，如果是要煎或其他料理方式，建議生的直接冷凍。</div>
+        <div class="original" style="font-size:13px;margin-top:6px">（抹鹽出水時間）看肉的厚度，大概20～30分鐘，記得擦乾。</div>
+      </div>
+    </div>
+
+    <div class="ing-card" data-name="豬軟骨 豬腹排 豬肉">
+      <div class="ing-name" onclick="toggleIng(this.parentElement)">🥩 豬軟骨 / 豬腹排<span class="ing-toggle">+</span></div>
+      <div class="ing-body">
+        <div class="original" style="font-size:13px">豬軟骨、豬腹排，雞肉塊，通常買回來後會先川燙去血水放涼，留下當次要料理的量，其餘裝袋冷凍，可放1～1.5個月。但如果你想要直接醃也行，只是這樣子冷凍保存兩週內為佳。
+
+豬軟骨、豬腹排這類肉類因烹煮至可食用需要較長時間，我通常先料理好再分裝冷凍。</div>
+      </div>
+    </div>
+
+    <div class="ing-card" data-name="竹筍 桂竹筍 筍">
+      <div class="ing-name" onclick="toggleIng(this.parentElement)">🎋 竹筍<span class="ing-toggle">+</span></div>
+      <div class="ing-body">
+        <div class="original" style="font-size:13px">竹筍算是偏涼性的食材，
+熱性體質的人吃寒涼的食物沒事，但寒性體質的人遇到像竹筍這類偏涼性的食材，就需採取改變它的性的料理方式，譬如：炒的料理方式
+
+煮湯是竹筍很好吃的料理方式，對身體偏寒的人來說，吃了可能會造成身體負擔</div>
+        <div class="original" style="font-size:13px;margin-top:6px">4-5月盛產期是品嚐春季限定「桂竹筍」的最佳時機，
+這時期的桂竹筍肉質鮮嫩中帶硬，適合滷、炒、燉湯。</div>
+      </div>
+    </div>
+
+    <div class="ing-card" data-name="小黃瓜 瓜">
+      <div class="ing-name" onclick="toggleIng(this.parentElement)">🥒 小黃瓜<span class="ing-toggle">+</span></div>
+      <div class="ing-body">
+        <div class="original" style="font-size:13px">今天我也是受不了佛手瓜的涼性，又想吸收他的營養，剛好現在是嫩薑的季節，就切了許多嫩薑和鮮香菇一起炒，吃起來身體反應很舒服。</div>
+        <div class="tip">林純瑜分享：把薑先炒過+木耳，最後小黃瓜拌一下，蓋鍋蓋悶，起來再加點香油，吃起來舒服很多，同時又保有小黃瓜的脆度。（家騏未另作補充）</div>
+      </div>
+    </div>
+
+    <div class="ing-card" data-name="葉菜 蔬菜">
+      <div class="ing-name" onclick="toggleIng(this.parentElement)">🥬 葉菜類<span class="ing-toggle">+</span></div>
+      <div class="ing-body">
+        <div class="original" style="font-size:13px">蔬菜洗過再冰：這方式雖然方便可立即下鍋但因有水氣容易腐敗，建議蔬菜買回來只洗三天內要煮的量，其他不要洗，用紙巾包起來放塑膠袋冷藏保存會更久。
+
+蔬菜類的保存重點在「不要洗＋減少水氣」，因此如果是容易爛的葉菜類，我會用廚房紙巾包起來放塑膠袋再冰，這樣子保存一週左右，即使葉子有點痿凋，再泡水一下子便會恢復生機。（有時候會用溫水泡，幫助葉子吸水）</div>
+      </div>
+    </div>
+
+    <div class="ing-card" data-name="白飯 米 飯">
+      <div class="ing-name" onclick="toggleIng(this.parentElement)">🍚 白飯 / 米<span class="ing-toggle">+</span></div>
+      <div class="ing-body">
+        <div class="original" style="font-size:13px">（冷凍白飯）我通常不退冰，直接電鍋蒸，可以吃到像剛煮好的熱飯。</div>
+        <div class="original" style="font-size:13px;margin-top:6px">防止米生蟲的方式：
+
+1. 冷藏/冷凍：不提供適合的溫度濕度就會讓蟲卵孵化，也可保鮮
+
+2. 米𥚃放辛香料讓蟲蟲不愛靠近，我會放家𥚃做菜會用到的：八角、花椒、辣椒乾、九層塔乾等
+
+3. 少量購買，不屯積</div>
+      </div>
+    </div>
+
+    <div class="ing-card" data-name="子薑 薑 嫩薑">
+      <div class="ing-name" onclick="toggleIng(this.parentElement)">🌿 子薑<span class="ing-toggle">+</span></div>
+      <div class="ing-body">
+        <div class="original" style="font-size:13px">子薑有春天尾巴鮮嫩的滋味，帶點初夏熱度的微辛辣。
+單吃，或與其他食材涼拌、炒或滷，滿口都是春末初夏的味道。</div>
+      </div>
+    </div>
+
+    <div class="ing-card" data-name="毛豆 毛豆仁">
+      <div class="ing-name" onclick="toggleIng(this.parentElement)">🫛 毛豆仁<span class="ing-toggle">+</span></div>
+      <div class="ing-body">
+        <div class="original" style="font-size:13px">毛豆仁算是耐煮的食材，不用擔心把他煮壞😆</div>
+      </div>
+    </div>
+
+    <div class="ing-card" data-name="青椒">
+      <div class="ing-name" onclick="toggleIng(this.parentElement)">🫑 青椒<span class="ing-toggle">+</span></div>
+      <div class="ing-body">
+        <div class="original" style="font-size:13px">青椒不耐水氣容易爛，最好是烹煮前再切。</div>
+      </div>
+    </div>
+
+  </div><!-- end ing-grid -->
+</div><!-- end ingredients section -->
+
+<!-- ===== 醬料調味 ===== -->
+<div id="sauces" class="section">
+  <div class="section-title">醬料調味</div>
+  <div class="section-desc">家騏提到的醬料組合與使用說明</div>
+
+  <div class="sub-title">涼拌醬料四款（4/18實體課分享）</div>
+  <div class="sauce-grid">
+    <div class="sauce-card"><div class="sauce-label">款一</div><div class="sauce-chips"><span class="sauce-chip">鹽麴</span><span class="sauce-chip">芥茉籽醬</span><span class="sauce-chip">橄欖油</span></div></div>
+    <div class="sauce-card"><div class="sauce-label">款二</div><div class="sauce-chips"><span class="sauce-chip">魚露</span><span class="sauce-chip">檸檬汁</span><span class="sauce-chip">糖</span><span class="sauce-chip">香油</span></div></div>
+    <div class="sauce-card"><div class="sauce-label">款三</div><div class="sauce-chips"><span class="sauce-chip">鹽昆布</span><span class="sauce-chip">柴魚</span><span class="sauce-chip">醬油</span><span class="sauce-chip">橄欖油</span></div></div>
+    <div class="sauce-card"><div class="sauce-label">款四</div><div class="sauce-chips"><span class="sauce-chip">柚子醬油</span><span class="sauce-chip">橄欖油</span></div></div>
+  </div>
+
+  <div class="sub-title">小松菜涼拌醬（回覆羽佩）</div>
+  <div class="original">小松菜很適合做涼拌菜，醬料可變化的也很多：芝麻醬鰹魚醬油混搭、芝麻醬鹽麴混搭、鹽昆布鰹魚醬混搭......。有時候身體想吃那種青菜，醬料怎麼配都覺得有吃到，但有時候對那天剛好對那種青菜無感，我會想辦法調個身體有感覺的醬料，邊試邊嚐直到對味，藉此帶起來這道拌青菜的能量</div>
+
+  <hr class="divider">
+
+  <div class="card" onclick="toggle(this)">
+    <div class="card-header"><div class="card-title">鹽麴是什麼，為什麼用它</div><div class="toggle-icon">+</div></div>
+    <div class="card-body">
+      <div class="original">鹽麴是由麴、鹽、糖、水發酵而來，能替代鹽、醬油、味素，我看中它的好處，想介紹給大家使用。
+它的鹽含量比一般食鹽少，可控制鹽份攝取；其中含有酵素、益生菌、B群等營養成分，能分解蛋白質及澱粉，有助調整腸胃菌種。
+涼拌的料理方式最能保留鹽麴的益生菌和酵素活性，所以推薦給大家。</div>
+      <div class="original" style="margin-top:8px">是，味噌的鹽份比較高，耐保存...
+
+哈哈哈...是啊，發酵品含有的益生菌，有的耐熱有的不耐熱，多去嚐試找到自己需要的就對了</div>
+    </div>
+  </div>
+
+  <div class="card" onclick="toggle(this)">
+    <div class="card-header"><div class="card-title">鹽麴醃肉注意事項（回覆童淑寬）</div><div class="toggle-icon">+</div></div>
+    <div class="card-body">
+      <div class="original">鹽麴醃，主要是藉鹽麴裡的酵素催化蛋白質，如醃太久，肉質變太軟而出水更易煎焦，且因鹽麴含糖分，直接下鍋煎時沒有控制好火候很容易產生梅納反應。
+
+✤有幾個方法可減少用爐火煎的梅納反應：
+1.下鍋前確實擦乾鹽麴，可減少大部份煎焦的情況
+2.鍋裡鋪烘焙紙，減少直接受熱及沾鍋
+3.油量夠+低溫慢煎+加鍋蓋半煎蒸
+4.確認肉已熟，在最後加大火力上色
+
+✤使用瓦斯爐火力調整不易，推薦用烤箱/氣炸鍋，方法差不多，好處是不容易焦
+
+✤鹽麴醃，最省力的料理方式：蒸/煮</div>
+    </div>
+  </div>
+
+  <div class="card" onclick="toggle(this)">
+    <div class="card-header"><div class="card-title">味噌醃肉比例</div><div class="toggle-icon">+</div></div>
+    <div class="card-body">
+      <div class="ratio-display">
+        <div class="ratio-pill">味噌 5</div><div class="ratio-colon">：</div>
+        <div class="ratio-pill">糖 2</div><div class="ratio-colon">：</div>
+        <div class="ratio-pill">酒 2</div>
+      </div>
+      <div class="original">醃食材的味噌醬比例，味增：糖：酒 = 5：2：2
+
+味噌旗魚醃漬時間約兩日，醃好洗掉味噌擦乾冷凍(冷藏)，可當餐料理也可預製冷藏，食用時滴一點檸檬</div>
+    </div>
+  </div>
+
+  <div class="card" onclick="toggle(this)">
+    <div class="card-header"><div class="card-title">市售醬料使用說明</div><div class="toggle-icon">+</div></div>
+    <div class="card-body">
+      <div class="original">至於先前我推薦的市售醬料，由於醬料本身調味層次多，醃過再冷凍後對食材產生的變化比較難預測，因此我通常用於已煮熟的食材上。</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 保存速查 ===== -->
+<div id="storage" class="section">
+  <div class="section-title">保存速查</div>
+  <div class="section-desc">家騏說的完整原話，不精簡</div>
+
+  <div class="storage-card">
+    <div class="storage-name" onclick="toggleStorage(this.parentElement)">生肉 / 調味後冷凍 / 期限原則<span class="storage-toggle">+</span></div>
+    <div class="storage-body">
+      <div class="original">冷凍是我們常用的保存方式，
+不過要知道冷凍用意是延長可食用效期，不是無限期保存，
+所以一般建議：
+*生肉:一個月內
+*調味後冷凍:2-3週內
+
+另外，你提到「放到忘記」，可以試試看在外袋上寫日期，並按時間順序排列冷凍，比較不會放到忘記。</div>
+    </div>
+  </div>
+
+  <div class="storage-card">
+    <div class="storage-name" onclick="toggleStorage(this.parentElement)">豬軟骨 / 豬腹排 / 雞肉塊<span class="storage-toggle">+</span></div>
+    <div class="storage-body">
+      <div class="original">豬軟骨、豬腹排，雞肉塊，通常買回來後會先川燙去血水放涼，留下當次要料理的量，其餘裝袋冷凍，可放1～1.5個月。但如果你想要直接醃也行，只是這樣子冷凍保存兩週內為佳。
+
+豬軟骨、豬腹排這類肉類因烹煮至可食用需要較長時間，我通常先料理好再分裝冷凍。</div>
+    </div>
+  </div>
+
+  <div class="storage-card">
+    <div class="storage-name" onclick="toggleStorage(this.parentElement)">雞腿（冷凍方式）<span class="storage-toggle">+</span></div>
+    <div class="storage-body">
+      <div class="original">雞腿先川燙再冷凍：這個做法比較適合燉煮用，如果是要煎或其他料理方式，建議生的直接冷凍。
+
+生的直接冷凍，通常能保留更多風味；熟的再冷凍，反而風味及口感變差。大部份的肉類都是如此。</div>
+    </div>
+  </div>
+
+  <div class="storage-card">
+    <div class="storage-name" onclick="toggleStorage(this.parentElement)">蝦（熟後保存）<span class="storage-toggle">+</span></div>
+    <div class="storage-body">
+      <div class="original">蝦子螃蟹之類容易腐敗的海鮮，確實先煮熟再冷凍可以保鮮，但食用方式是先放冷藏解凍，再放室溫退冰，並不適合再加熱，再次加熱常會讓風味流失肉質口感改變。
+另外，蝦子中間黑黑的一條，有沒有可能是蝦子的腸泥腺，建議在生的時候先去掉再料理會比較好。</div>
+    </div>
+  </div>
+
+  <div class="storage-card">
+    <div class="storage-name" onclick="toggleStorage(this.parentElement)">整隻帶殼蝦 / 小卷<span class="storage-toggle">+</span></div>
+    <div class="storage-body">
+      <div class="original">如果是整隻帶殻未處理的蝦、小卷之類的海鮮，分裝時會加入蓋過食材的水量再冷凍，用意是比較不會有凍傷。</div>
+    </div>
+  </div>
+
+  <div class="storage-card">
+    <div class="storage-name" onclick="toggleStorage(this.parentElement)">鮭魚<span class="storage-toggle">+</span></div>
+    <div class="storage-body">
+      <div class="original">鮭魚算是容易熟的食材，不必先煮熟再冷凍，
+可以用你喜歡的口味先醃漬後冷凍，食用前一天拿到冷藏退冰。
+煎或烤之前擦乾再入鍋，當餐現料理比較可以吃到魚的風味，而且所費時間也不多。</div>
+      <div class="label" style="margin-top:10px">熟鮭魚復熱</div>
+      <div class="original">煮熟的鮭魚的復熱方式，冷藏解凍後我會用電鍋保溫的方式來復熱(電鍋先放30cc水按下跳起後放入在保溫狀態約半小時），而不會再蒸過，這樣可以保持魚肉的口感及風味接近你煮好時的狀態。</div>
+    </div>
+  </div>
+
+  <div class="storage-card">
+    <div class="storage-name" onclick="toggleStorage(this.parentElement)">韓式泡菜拌雞絲<span class="storage-toggle">+</span></div>
+    <div class="storage-body">
+      <div class="original">剩餘的雞絲可冰冷藏3-4天，作為其他餐涼拌菜的蛋白質</div>
+    </div>
+  </div>
+
+  <div class="storage-card">
+    <div class="storage-name" onclick="toggleStorage(this.parentElement)">滷牛腱<span class="storage-toggle">+</span></div>
+    <div class="storage-body">
+      <div class="original">泡在滷汁裡放涼後取出分裝冷凍，想吃時拿一顆出來冷藏退冰，隔天切片加上青蔥香油醬汁作為配菜
+
+滷牛腱以冷食為主，不建議加熱後切片。如果不喜冷感，可放至退到室溫再食用</div>
+    </div>
+  </div>
+
+  <div class="storage-card">
+    <div class="storage-name" onclick="toggleStorage(this.parentElement)">豆腐烘蛋（蛋泥 / 煎熟）<span class="storage-toggle">+</span></div>
+    <div class="storage-body">
+      <div class="original">1️⃣因包含各種食材(彼此產生化學變化易變質），預先拌好的豆腐蛋泥冷藏兩天內是最適宜的。
+2️⃣如果想冷藏三天以上，食材要分開存放:豆腐和蛋拌勻、料切好，要下鍋前合併及調味。
+3️⃣全部煎起來的做法也是選項，但以冷藏三天內食用完為最佳。</div>
+    </div>
+  </div>
+
+  <div class="storage-card">
+    <div class="storage-name" onclick="toggleStorage(this.parentElement)">菇類<span class="storage-toggle">+</span></div>
+    <div class="storage-body">
+      <div class="original">現在菇類都是太空包栽培，一般都算乾淨不用清洗。
+當次料理用不完的部分，可以先切成之後料理需要的尺寸，譬如切塊切片切絲，裝袋冷凍。
+下次料理前直接拿出來下鍋就行</div>
+    </div>
+  </div>
+
+  <div class="storage-card">
+    <div class="storage-name" onclick="toggleStorage(this.parentElement)">蓮藕 / 山藥<span class="storage-toggle">+</span></div>
+    <div class="storage-body">
+      <div class="original">蓮藕、山藥，也很適合作為常備菜，買回來洗淨切片或切塊裝袋冷凍，料理前拿出來退冰即可下鍋，他們雖然是植物但不會因為冷凍改變口感。</div>
+    </div>
+  </div>
+
+  <div class="storage-card">
+    <div class="storage-name" onclick="toggleStorage(this.parentElement)">葉菜類<span class="storage-toggle">+</span></div>
+    <div class="storage-body">
+      <div class="original">蔬菜類的保存重點在「不要洗＋減少水氣」，因此如果是容易爛的葉菜類，我會用廚房紙巾包起來放塑膠袋再冰，這樣子保存一週左右，即使葉子有點痿凋，再泡水一下子便會恢復生機。（有時候會用溫水泡，幫助葉子吸水）
+
+建議蔬菜買回來只洗三天內要煮的量，其他不要洗，用紙巾包起來放塑膠袋冷藏保存會更久。</div>
+    </div>
+  </div>
+
+  <div class="storage-card">
+    <div class="storage-name" onclick="toggleStorage(this.parentElement)">青椒<span class="storage-toggle">+</span></div>
+    <div class="storage-body">
+      <div class="original">青椒不耐水氣容易爛，最好是烹煮前再切。</div>
+    </div>
+  </div>
+
+  <div class="storage-card">
+    <div class="storage-name" onclick="toggleStorage(this.parentElement)">白飯（冷凍）<span class="storage-toggle">+</span></div>
+    <div class="storage-body">
+      <div class="original">（冷凍白飯）我通常不退冰，直接電鍋蒸，可以吃到像剛煮好的熱飯。</div>
+    </div>
+  </div>
+
+  <div class="storage-card">
+    <div class="storage-name" onclick="toggleStorage(this.parentElement)">米（防蟲）<span class="storage-toggle">+</span></div>
+    <div class="storage-body">
+      <div class="original">防止米生蟲的方式：
+
+1. 冷藏/冷凍：不提供適合的溫度濕度就會讓蟲卵孵化，也可保鮮
+
+2. 米𥚃放辛香料讓蟲蟲不愛靠近，我會放家𥚃做菜會用到的：八角、花椒、辣椒乾、九層塔乾等
+
+3. 少量購買，不屯積</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 料理觀念 ===== -->
+<div id="knowledge" class="section">
+  <div class="section-title">料理觀念</div>
+  <div class="section-desc">家騏說的飲食哲學，原話呈現</div>
+
+  <div class="card" onclick="toggle(this)">
+    <div class="card-header"><div class="card-title">這個群組／課程的目的</div><div class="toggle-icon">+</div></div>
+    <div class="card-body">
+      <div class="original">分享我做常備菜經驗是：
+爲了縮短大家每日備餐時間，又可以吃到必須的營養。
+
+而在成長上，
+建立覺知到自己身體真實狀態的資料庫、
+親密身體飲食上的需要、
+建立了解各種食材補養自己身體需要的資料庫。
+
+進一步的，藉由飲食覺知到自己的原生意識和無明慣性。</div>
+      <div class="original" style="margin-top:8px">每月一次的實體課學習雖然深刻，但真正的進步其實發生在「每日自己的備餐過程」中。
+
+實體課是引導，而真正的學習是在您自家的廚房裡。因此，我們更鼓勵大家善用群組互動，在日常備餐中遇到任何想改善的細節、或想請教的技巧，請直接在群組裡和我互動。這種「教練式陪伴」的即時交流，才是這門課最珍貴的資源。</div>
+      <div class="original" style="margin-top:8px">因此善用這群組提問，會比實體課更即時，也是最有效的學習</div>
+    </div>
+  </div>
+
+  <div class="card" onclick="toggle(this)">
+    <div class="card-header"><div class="card-title">對準身體的需要</div><div class="toggle-icon">+</div></div>
+    <div class="card-body">
+      <div class="original">對準身體的需要，需要多方嚐試，每個人身體回應訊號方式不盡相同。有時候是頭腦走在前面的訊息，最接近的方式是直接去找來吃一點點，看當下身體的反應。想吃大朵香菇就去找來吃看看啊，不一定要全套香菇雞湯要準備到位才能試😉</div>
+    </div>
+  </div>
+
+  <div class="card" onclick="toggle(this)">
+    <div class="card-header"><div class="card-title">親密食材</div><div class="toggle-icon">+</div></div>
+    <div class="card-body">
+      <div class="original">我之所以詢問大家那兩個問題，是想了解大家是怎麼和食材建立親密關係的。
+
+所謂「親密食材」，是指帶著覺察、帶著感受去接觸它——當我們在市場相中它、買了它，帶回家後處理它（烹煮或冷藏冷凍），那一連串的過程，都在呈現我們親密自己、親密食材的狀態。而這個過程本身，已經開始在和食物建立關係、吸收它的能量了，有發現嗎？
+
+或許有人會問：為什麼要親密食材，按照完美的SOP去料理不就好了？
+其實食材從你買下來到成為食物，不是吃進身體才成為養份。而是在你接觸它、感覺它的時候，那個能量交換就已經在發生了。當你真的感受到這個食材，你自然會知道它適合怎麼保存、怎麼烹調，什麼方式對它好，也對你好。完美的SOP固然方便，但不見得適合所有人，也不見得適合當下的你，不是嗎？😉
+
+下次採買時，試著感覺一下自己身體需要什麼，也感覺你手裡挑中的食材，它的重量、溫度、氣味，看看你會不會多一點靈感。</div>
+      <div class="original" style="margin-top:8px">「親密」，不只是貼近自己哦！</div>
+    </div>
+  </div>
+
+  <div class="card" onclick="toggle(this)">
+    <div class="card-header"><div class="card-title">備餐也是靜心</div><div class="toggle-icon">+</div></div>
+    <div class="card-body">
+      <div class="original">如果你是有實驗精神的人，可以自己玩看看～
+同樣的食材、同樣的料理工序，不同天自己狀態不同時，做同一道菜的風味和能量會不一樣...。
+
+這樣子你就會知道，要做出美味又滋養自己的食物，很關鍵的條件，做菜的人的靜心品質。而且，因為有了這層瞭解，備餐也能成為一種靜心。
+
+我常在伏案工作一段時間需要站起來動一動時，會走去廚房做點事，有時是拿出下一餐要做的食材感覺他、有時是洗/挑/切菜、有時是打蛋醃肉....等等小事，透過工作靜心重新把自己調焦回來。
+
+當然，工作靜心的面向很多，你找自己有感覺的事物去試。</div>
+    </div>
+  </div>
+
+  <div class="card" onclick="toggle(this)">
+    <div class="card-header"><div class="card-title">普拉那：食物的生命能量</div><div class="toggle-icon">+</div></div>
+    <div class="card-body">
+      <div class="original">普拉那：氣、生命力、生命能量
+這是我和天地萬物持續在交換的東西，包括我們吃進去的食物</div>
+      <div class="original" style="margin-top:8px">食材經過料理烹煮等過程，逐漸改變他的性質，他的普拉那也在改變。
+為了我們工作生活之便而事先備餐，我通常也會考量這個條件，怎麼在最佳賞味期限內食用.</div>
+    </div>
+  </div>
+
+  <div class="card" onclick="toggle(this)">
+    <div class="card-header"><div class="card-title">食材的寒熱屬性</div><div class="toggle-icon">+</div></div>
+    <div class="card-body">
+      <div class="original">之前曾提過要攝取什麼食物要去感知自己身體的狀況和需要，其中一個面向就是燥熱or寒涼
+
+竹筍算是偏涼性的食材，
+熱性體質的人吃寒涼的食物沒事，但寒性體質的人遇到像竹筍這類偏涼性的食材，就需採取改變它的性的料理方式，譬如：炒的料理方式
+
+我們吃進食物都是爲了滋養自己，這是其中一個我會評估的面向</div>
+      <div class="original" style="margin-top:8px">有句俗話說：
+冬吃蘿蔔夏吃薑，不用醫師開藥方。
+
+「夏天吃薑」是藉由薑的溫辛平衡體內陰陽。
+
+夏天氣候炎熱，容易貪涼飲冷，體內陽氣較虛，吃薑正好可以起到溫補以助陽氣的作用，
+進而排除部分臟腑寒氣至體表，以對抗炎熱的氣溫，使身體達到陰陽平衡，通體舒暢。
+
+醃漬過的蘿蔔，其本身的寒涼屬性會改變喔</div>
+    </div>
+  </div>
+
+  <div class="card" onclick="toggle(this)">
+    <div class="card-header"><div class="card-title">怎麼選常備菜</div><div class="toggle-icon">+</div></div>
+    <div class="card-body">
+      <div class="original">我判斷哪些食材適合做成常備菜，取決於食材在煮熟後再加熱時，其普拉那/風味/色澤等條件改變的程度</div>
+      <div class="original" style="margin-top:8px">善用常備菜的能力之一，就是能分辨哪些菜吃涼的、哪些菜吃溫的，哪些菜再加熱也不改變風味，很實在地吃到食物被料理出來的能量。
+太好了，這能力你正在蓄積中......</div>
+    </div>
+  </div>
+
+  <div class="card" onclick="toggle(this)">
+    <div class="card-header"><div class="card-title">節氣飲食</div><div class="toggle-icon">+</div></div>
+    <div class="card-body">
+      <div class="original">節氣走到春末初夏交接之際，這時節的子薑和桂竹筍很美味。
+
+子薑有春天尾巴鮮嫩的滋味，帶點初夏熱度的微辛辣。
+單吃，或與其他食材涼拌、炒或滷，滿口都是春末初夏的味道。
+
+最近如果去傳統市場，會看到許多攤子都擺著一大盆的桂竹筍。
+4-5月盛產期是品嚐春季限定「桂竹筍」的最佳時機，
+這時期的桂竹筍肉質鮮嫩中帶硬，適合滷、炒、燉湯。
+
+即使腦袋不知道節氣，吃進去的食物自然會提醒你，
+我喜歡這種身體與天地萬物同步最直接的方式。</div>
+    </div>
+  </div>
+
+  <div class="card" onclick="toggle(this)">
+    <div class="card-header"><div class="card-title">親密觀照的蓄積</div><div class="toggle-icon">+</div></div>
+    <div class="card-body">
+      <div class="original">從你回應『一層一層的⋯⋯』，
+可知你不明白「親密觀照」怎麼蓄積的，還在認知上堆疊⋯⋯
+
+我雞婆一點簡單說，也說給有需要的人吸收～
+
+你們已經煉命多年，有覺察能力，
+當覺察到自己的狀態：『求方便、快速，少了貼近跟耐心』，
+
+意謂著自己塞滿「意識/我識」的狀態，沒有空間給觀照，更別說親密⋯⋯。
+
+覺察到的當下，立馬可以改變啊～
+
+回到身識，連線阿識，
+
+身阿連線"當下即是"！
+
+觀照的空間出來了，
+
+觀者與所觀之物⋯⋯親密的氛圍瀰漫開來，
+
+蓄積發生中⋯⋯😇</div>
+      <div class="original" style="margin-top:8px">不要用這種似是而非的說辭忽悠自己啦！
+
+親密，最簡單有效的蓄積就在每個當下的覺察，不是嗎😏
+
+『相當足夠的時間、空間去培養』的方法，在AI時代肯定來不及，建議你可以考慮或許重新投胎做古人🤣🤣🤣</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── 全站搜尋索引 ──
+const INDEX = [];
+
+function buildIndex() {
+  // 食譜
+  document.querySelectorAll('#recipe-list .card').forEach(card => {
+    const title = card.querySelector('.card-title').textContent;
+    const body = card.querySelector('.card-body').textContent;
+    const kw = card.dataset.keywords || '';
+    INDEX.push({ section: '食譜', tab: 'recipes', title, body: body + ' ' + kw, el: card });
+  });
+  // 食材
+  document.querySelectorAll('#ing-grid .ing-card').forEach(card => {
+    const title = card.querySelector('.ing-name').textContent.replace('+','').trim();
+    const body = (card.querySelector('.ing-body') || card).textContent;
+    const kw = card.dataset.name || '';
+    INDEX.push({ section: '食材索引', tab: 'ingredients', title, body: body + ' ' + kw, el: card });
+  });
+  // 醬料
+  document.querySelectorAll('#sauces .card').forEach(card => {
+    const title = card.querySelector('.card-title').textContent;
+    const body = card.querySelector('.card-body').textContent;
+    INDEX.push({ section: '醬料調味', tab: 'sauces', title, body, el: card });
+  });
+  // 保存速查
+  document.querySelectorAll('#storage .storage-card').forEach(card => {
+    const title = card.querySelector('.storage-name').textContent.replace('+','').trim();
+    const body = (card.querySelector('.storage-body') || card).textContent;
+    INDEX.push({ section: '保存速查', tab: 'storage', title, body, el: card });
+  });
+  // 料理觀念
+  document.querySelectorAll('#knowledge .card').forEach(card => {
+    const title = card.querySelector('.card-title').textContent;
+    const body = card.querySelector('.card-body').textContent;
+    INDEX.push({ section: '料理觀念', tab: 'knowledge', title, body, el: card });
+  });
+}
+
+function highlight(text, query) {
+  const safe = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return text.replace(new RegExp(safe, 'gi'), m => `<mark>${m}</mark>`);
+}
+
+function snippet(text, query, len = 80) {
+  const idx = text.toLowerCase().indexOf(query.toLowerCase());
+  if (idx === -1) return text.slice(0, len) + '…';
+  const start = Math.max(0, idx - 20);
+  const end = Math.min(text.length, idx + len);
+  return (start > 0 ? '…' : '') + text.slice(start, end) + (end < text.length ? '…' : '');
+}
+
+function globalSearch(val) {
+  const q = val.trim();
+  const resultsEl = document.getElementById('global-results');
+  const nav = document.getElementById('mainNav');
+  const sections = document.querySelectorAll('.section');
+
+  if (!q) {
+    resultsEl.innerHTML = '';
+    resultsEl.classList.remove('active');
+    nav.style.display = '';
+    sections.forEach(s => { if (s.id === 'recipes') s.classList.add('active'); else s.classList.remove('active'); });
+    document.querySelectorAll('nav button').forEach((b, i) => { if (i === 0) b.classList.add('active'); else b.classList.remove('active'); });
+    return;
+  }
+
+  // 搜尋時隱藏分頁內容
+  nav.style.display = 'none';
+  sections.forEach(s => s.classList.remove('active'));
+
+  const hits = INDEX.filter(item =>
+    item.title.toLowerCase().includes(q.toLowerCase()) ||
+    item.body.toLowerCase().includes(q.toLowerCase())
+  );
+
+  if (hits.length === 0) {
+    resultsEl.innerHTML = `<div class="no-results">找不到「${q}」的相關內容</div>`;
+    resultsEl.classList.add('active');
+    return;
+  }
+
+  const html = hits.map(hit => {
+    const snip = snippet(hit.body.replace(/\s+/g, ' '), q);
+    return `<div class="result-item" onclick="goToResult('${hit.tab}', '${CSS.escape(hit.title)}')">
+      <div class="result-section">${hit.section}</div>
+      <div class="result-title">${highlight(hit.title, q)}</div>
+      <div class="result-snippet">${highlight(snip, q)}</div>
+    </div>`;
+  }).join('');
+
+  resultsEl.innerHTML = `<p style="font-size:13px;color:var(--muted);margin-bottom:1rem">找到 ${hits.length} 筆結果</p>` + html;
+  resultsEl.classList.add('active');
+}
+
+function goToResult(tab, title) {
+  // 清空搜尋
+  document.getElementById('globalInput').value = '';
+  document.getElementById('global-results').innerHTML = '';
+  document.getElementById('global-results').classList.remove('active');
+  document.getElementById('mainNav').style.display = '';
+
+  // 切換分頁
+  const btn = document.querySelector(`nav button[onclick="show('${tab}', this)"]`);
+  if (btn) show(tab, btn);
+
+  // 找到對應卡片並展開、捲動
+  setTimeout(() => {
+    const cards = document.querySelectorAll(`#${tab} .card, #${tab} .storage-card, #${tab} .ing-card`);
+    for (const card of cards) {
+      const titleEl = card.querySelector('.card-title, .storage-name, .ing-name');
+      if (titleEl && titleEl.textContent.replace('+','').trim() === title) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        card.classList.add('open');
+        card.style.outline = '2px solid var(--accent)';
+        setTimeout(() => card.style.outline = '', 2000);
+        break;
+      }
+    }
+  }, 100);
+}
+
+// ── 分頁切換 ──
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ── 卡片展開 ──
+function toggle(card) { card.classList.toggle('open'); }
+function toggleIng(card) { card.classList.toggle('open'); }
+function toggleStorage(card) { card.classList.toggle('open'); }
+
+// ── 食譜搜尋 ──
+function filterCards(listId, val) {
+  const v = val.trim().toLowerCase();
+  document.querySelectorAll(`#${listId} .card`).forEach(card => {
+    const text = (card.querySelector('.card-title').textContent + ' ' + (card.dataset.keywords || '') + ' ' + card.querySelector('.card-body').textContent).toLowerCase();
+    card.classList.toggle('hidden', v !== '' && !text.includes(v));
+  });
+}
+
+// ── 食材搜尋 ──
+function filterIngredients(val) {
+  const v = val.trim().toLowerCase();
+  document.querySelectorAll('#ing-grid .ing-card').forEach(c => {
+    const name = (c.dataset.name + ' ' + c.textContent).toLowerCase();
+    c.classList.toggle('hidden', v !== '' && !name.includes(v));
+  });
+}
+
+// ── 建立索引 ──
+window.addEventListener('DOMContentLoaded', buildIndex);
+</script>
+</body>
+</html>
